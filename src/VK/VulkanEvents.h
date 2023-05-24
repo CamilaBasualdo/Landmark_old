@@ -19,8 +19,19 @@ namespace Landmark
 
 
 		class Event_VulkanPhysicalDevicesPreInit : Events::Event {
+			
 		public:
 
+			struct AvailableDeviceDetails {
+				const VkPhysicalDeviceProperties deviceProperties;
+				const VkPhysicalDeviceFeatures deviceFeatures;
+				const std::vector<VkExtensionProperties> deviceExtensions;
+				const std::vector<VkLayerProperties> deviceLayers;
+			};
+			const std::vector<AvailableDeviceDetails> AvailableDevices;
+			Event_VulkanPhysicalDevicesPreInit(std::vector<AvailableDeviceDetails> _devices) :AvailableDevices(_devices) {
+
+			}
 		};
 	}
 }

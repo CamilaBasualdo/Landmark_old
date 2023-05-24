@@ -32,16 +32,16 @@ namespace Landmark
 		public:
 			using EventCallback = std::function<void(T&)>;
 
-			void addCallback(EventCallback callback) {
-				eventCallbacks.push_back(std::move(callback));
+			void addSubscriber(EventCallback callback) {
+				eventCallbacks.push_back(callback);
 			}
 
-			T Dispatch(Event* t) override {
-				T& e = *dynamic_cast<T*>(t);
+			void Dispatch(Event* t) override {
+				T& e = *reinterpret_cast<T*>(t);
 				for (const auto& callback : eventCallbacks) {
 					callback(e);
 				}
-				return t;
+			
 			}
 
 			virtual int GetSubscriberCount() override
@@ -62,7 +62,7 @@ namespace Landmark
 		{
 			friend class EventDispatcher;
 			friend class EventSubscriber;
-			static inline std::map<const std::type_info*, std::unique_ptr< EventHandlerBase>> EventHandlers = {};
+			static inline std::map<const std::type_info*, EventHandlerBase*> EventHandlers = {};
 			static inline Debug::Logger _EventSystem_Logger = Debug::Debugger::GetLogger("EventSystem");
 
 		protected:
@@ -77,10 +77,10 @@ namespace Landmark
 					return;
 				}
 				else {
-					LogMessage += std::to_string(EventHandlers[&typeid(T)].get()->GetSubscriberCount()) + " Subscribers.";
+					LogMessage += std::to_string(EventHandlers[&typeid(T)]->GetSubscriberCount()) + " Subscriber(s).";
 					_EventSystem_Logger.Log(LogMessage);
 					//_EventSystem_Logger.Log(std::string("Dispatching Event ") + std::string(typeid(T).Name());
-					EventHandlers[&typeid(T)].get()->Dispatch(reinterpret_cast<Event*>(&t));
+					EventHandlers[&typeid(T)]->Dispatch(reinterpret_cast<Event*>(&t));
 				}
 
 
@@ -89,10 +89,20 @@ namespace Landmark
 			template <typename T>
 			static TemplateEventBaseCheck(void)
 				SubscribeTo(std::function<void(T&)> callback) {
-				//auto type = typeid(T);
-				//if (!EventHandlers.contains(type)) EventHandlers.insert(type,std::make_unique(EventHandler<T>));
-
-				//EventHandlers[type].get().addCallback(callback);
+				auto type = &typeid(T);
+				EventHandler<T>* Handler;
+				if (!EventHandlers.contains(type)) {
+					Handler = new EventHandler<T>();
+					EventHandlers[type] = reinterpret_cast<EventHandlerBase*>(Handler);
+					/*
+					EventHandlers.insert(
+						std::pair<std::type_info*, std::unique_ptr<EventHandlerBase>>
+						(type, std::make_unique< EventHandler<T>>() ));*/
+				}
+				else Handler = dynamic_cast<EventHandler<T>*>( EventHandlers[type]);
+				
+				Handler->addSubscriber(callback);
+				_EventSystem_Logger.Log("New Subscription to " + std::string(type->name()).substr(6));
 			}
 
 		};
@@ -103,7 +113,7 @@ namespace Landmark
 			template <typename T, typename... Args>
 			static TemplateEventBaseCheck(T)
 				DispatchEvent(Args&&... args) {
-				T _event = T(std::forward<Args>(args));
+				T _event = T(std::forward<Args>(args)...);
 				EventSystem::Dispatch<T>(_event);
 				return _event;
 			}
@@ -132,7 +142,7 @@ namespace Landmark
 			TemplateEventBaseCheck(void)
 				SubscribeTo(std::function<void(T&)> callback) {
 				//Subscriptions.insert(std::pair<std::type_info, int>(typeid(T), 0));
-				//EventSystem::SubscribeTo<T>(callback);
+				EventSystem::SubscribeTo<T>(callback);
 			}
 			template <typename T>
 			TemplateEventBaseCheck(void)

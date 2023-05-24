@@ -1,6 +1,8 @@
 #include "Vulkan.h"
 #include <GLFW/glfw3.h>
 #include "DeviceManager.h"
+#include <sstream>
+#include <vulkan/vk_enum_string_helper.h>
 namespace Landmark
 {
 	namespace Vk
@@ -16,8 +18,49 @@ namespace Landmark
 			}
 		}
 		
-		void VulkanValidationLogFormat(const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData) {
-			static Debug::Logger _logger = Debug::Debugger::GetLogger("Vulkan Validation");
+		std::string VulkanValidationLogFormat(const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData) {
+			//static Debug::Logger _logger = Debug::Debugger::GetLogger("Vulkan Validation");
+
+			std::string ValidationLog = "\n=== " + std::string(pCallbackData->pMessageIdName) +" ===\n";
+			ValidationLog += std::to_string(pCallbackData->objectCount) +" Object(s) \n";
+			for (int i = 0; i < pCallbackData->objectCount; i++) {
+				ValidationLog += " " + std::to_string(i) + "| ";
+				ValidationLog += (pCallbackData->pObjects[i].pObjectName) ? pCallbackData->pObjects[i].pObjectName : "No Name" + std::string(" | ");
+				
+				ValidationLog += std::string(string_VkObjectType(pCallbackData->pObjects[i].objectType)) + " | ";
+
+				std::ostringstream oss; oss<< "0x" << reinterpret_cast<void*>(pCallbackData->pObjects[i].objectHandle);
+				ValidationLog += oss.str() + "\n";
+				
+			}
+
+			//QUEUES
+			ValidationLog += std::to_string(pCallbackData->queueLabelCount) + " Queue(s) \n";
+
+			for (int i = 0; i < pCallbackData->queueLabelCount; i++) {
+				ValidationLog += " " + std::to_string(i) + "| ";
+				ValidationLog += ((pCallbackData->pQueueLabels->pLabelName) ? pCallbackData->pQueueLabels->pLabelName : "No Name")  + std::string("\n");
+			
+				//std::ostringstream oss; oss << reinterpret_cast<void*>(pCallbackData->pQueueLabels->);
+				//ValidationLog += oss.str() + "\n";
+
+			}
+			ValidationLog += std::to_string(pCallbackData->cmdBufLabelCount) + " CmdBuffer(s) \n";
+			if (pCallbackData->cmdBufLabelCount == 0) ValidationLog += "None\n";
+			else ValidationLog += "\n";
+			for (int i = 0; i < pCallbackData->cmdBufLabelCount; i++) {
+				ValidationLog += " " + std::to_string(i) + "| ";
+				ValidationLog += ((pCallbackData->pCmdBufLabels->pLabelName) ? pCallbackData->pCmdBufLabels->pLabelName : "No Name") + std::string("\n");
+
+				//std::ostringstream oss; oss << reinterpret_cast<void*>(pCallbackData->pQueueLabels->);
+				//ValidationLog += oss.str() + "\n";
+
+			}
+			ValidationLog += std::string("Log:\n") + pCallbackData->pMessage + std::string("\n");
+
+			ValidationLog += "========================================================\n";
+			return ValidationLog;
+			//_logger.Log(ValidationLog);
 
 			
 		}
@@ -25,23 +68,25 @@ namespace Landmark
 		static VKAPI_ATTR VkBool32 VKAPI_CALL VulkankValidationCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,VkDebugUtilsMessageTypeFlagsEXT messageType,const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,void* pUserData) {
 			static Debug::Logger _logger = Debug::Debugger::GetLogger("Vulkan Validation");
 
-			VulkanValidationLogFormat(pCallbackData);
-
+			auto ss = VulkanValidationLogFormat(pCallbackData);
+			
+			
 			switch (messageSeverity) {
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-				_logger.Log(pCallbackData->pMessage);
+				_logger.Log(ss);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-				_logger.Log(pCallbackData->pMessage);
+				_logger.Log(ss);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-				_logger.Warning(pCallbackData->pMessage);
+				_logger.Warning(ss);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-				_logger.Error(pCallbackData->pMessage);
+				_logger.Error(ss);
 				break;
 
 			}
+			
 			//std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
 			return VK_FALSE;
@@ -49,19 +94,35 @@ namespace Landmark
 		 
 		
 		
-		void Vulkan::Init(const VulkanInitParameters param) {
+	
+
+		std::string Vulkan::GetName() const
+		{
+			return std::string();
+		}
+
+		void Vulkan::PreInit()
+		{
+		}
+
+		void Vulkan::Init()
+		{
 			
-			auto EventReturn = DispatchEvent<Event_VulkanInstancePreInit>();
-			InstanceInit(param);
+			InstanceInit();
 
 			DeviceManager::Init();
 
-			
+			vkDestroyInstance(_VkInstance, nullptr);
+		}
+
+		void Vulkan::PostInit()
+		{
 		}
 		
 		
-		void Vulkan::InstanceInit(const VulkanInitParameters param)
+		void Vulkan::InstanceInit()
 		{
+			auto EventReturn = DispatchEvent<Event_VulkanInstancePreInit>();
 			LOGGER.Debug("Initializing GLFW");
 			if (!glfwInit()) {
 				const char* Desc;
@@ -77,7 +138,7 @@ namespace Landmark
 			LOGGER.Debug("Initializing Vulkan");
 			VkApplicationInfo appInfo{};
 			appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-			appInfo.pApplicationName = param.AppName;
+			appInfo.pApplicationName = "";
 			appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 			appInfo.pEngineName = "Landmark Engine";
 			appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -115,7 +176,7 @@ namespace Landmark
 			LOGGER.Log(ExtensionsString);
 
 			std::vector<const char*> ValidationLayers = {};
-			if (param.ValidationMode) {
+			if (InitializationParameters.ValidationMode) {
 				ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 				createInfo.enabledLayerCount = ValidationLayers.size();
 				createInfo.ppEnabledLayerNames = ValidationLayers.data();
@@ -150,8 +211,8 @@ namespace Landmark
 			{
 				VkDebugUtilsMessengerCreateInfoEXT createInfo{};
 				createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-				createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-				createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+				createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT| VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+				createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT ;
 				createInfo.pfnUserCallback = VulkankValidationCallback;
 				createInfo.pUserData = nullptr; // Optional
 

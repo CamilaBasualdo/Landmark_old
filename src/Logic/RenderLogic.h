@@ -2,23 +2,27 @@
 #include "../Events/EventSystem.h"
 #include "../VK/VulkanEvents.h"
 #include "../Module/Module.h"
+#include "../Debug/Debug.h"
 namespace Landmark
 {
 	namespace Render
 	{
 
-		class RenderLogic : IModule,Events::EventSubscriber
+		class RenderSystem :Module,Events::EventSubscriber
 		{
-			RenderLogic();
+			
 
 
 
 			void VulkanQueuesPreInitCallback(Vk::Event_VulkanQueuesPreInit& e) {
 
 			}
+
+			static inline Debug::Logger LOGGER = Debug::Debugger::GetLogger("RenderSystem");
+
 		public:
 		
-			
+			RenderSystem();
 
 			// Inherited via IModule
 			virtual std::string GetName() const override;

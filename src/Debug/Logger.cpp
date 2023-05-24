@@ -2,15 +2,23 @@
 #include <iostream>
 namespace Landmark {
     namespace Debug {
-        void Logger::Log_List(std::string Title, std::initializer_list<std::string> Content, LogColor TextColor, LogColor Background)
+        std::string Logger::ComposeMessage(std::string Contents,LogColor TextColor, LogColor Background) {
+            return "[" + Origin + "] " + LogColorAnsiCode(TextColor) + LogColorAnsiCodeBackground(Background)
+                + Contents + Reset + "\n";
+        }
+        void Logger::Log_List(std::string Title, std::vector<std::string>& Content, LogColor TextColor, LogColor Background)
         {
-
+            std::string CompleteMessage = Title +"\n\n";
+            for (auto c : Content)
+                CompleteMessage += " | "+ c + "\n";
+           // CompleteMessage += "+=====";
+            CompleteMessage;
+            Log(CompleteMessage, TextColor, Background);
         }
         void Logger::Log(std::string log, LogColor TextColor, LogColor Background)
         {
 
-            std::cout << "[" << Origin << "] " << "\033[1;" << static_cast<int>(TextColor) << "m" << "\033[1;" << static_cast<int>(Background) + 10 << "m"
-                 << log << Reset << "\n";
+            std::cout << ComposeMessage(log, TextColor, Background);
         }
 
         void Logger::Debug(std::string log)

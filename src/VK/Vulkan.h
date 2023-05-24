@@ -14,7 +14,7 @@ namespace Landmark
 			const char* AppName = nullptr;
 			bool ValidationMode = false;
 		};
-		class Vulkan : Events::EventDispatcher {
+		class Vulkan :Module, Events::EventDispatcher {
 			friend Engine;
 			friend DeviceManager;
 			static inline Debug::Logger LOGGER = Debug::Debugger::GetLogger("Vulkan");
@@ -22,17 +22,20 @@ namespace Landmark
 
 			static inline VkInstance _VkInstance;
 			static inline VkDebugUtilsMessengerEXT debugMessenger;
-			Vulkan() {
-				std::cout << "teste";
+			Vulkan(VulkanInitParameters _p) :InitializationParameters(_p){
 
-				DispatchEvent<Event_VulkanQueuesPreInit>();
-				//DispatchEvent<Vulkan>();
 			}
-
-			static void InstanceInit(const VulkanInitParameters param);
+			const VulkanInitParameters InitializationParameters;
+			void InstanceInit();
 		protected:
 			static VkInstance& GetVkInstance() { return _VkInstance; }
-			static void Init(const VulkanInitParameters param);
+			
+
+			// Inherited via Module
+			virtual std::string GetName() const override;
+			virtual void PreInit() override;
+			virtual void Init() override;
+			virtual void PostInit() override;
 		};
 
 

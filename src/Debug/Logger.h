@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 namespace Landmark {
     namespace Debug {
         class Debugger;
@@ -32,7 +33,14 @@ namespace Landmark {
                 bright_white = 97
             };
 
-            void Log_List(std::string Title, std::initializer_list<std::string> Content, LogColor TextColor = white, LogColor Background = black);
+            static std::string LogColorAnsiCode(LogColor color) {
+                return "\033[1;" + std::to_string(static_cast<int>(color)) + "m";
+            }
+            static std::string LogColorAnsiCodeBackground(LogColor color) {
+                return "\033[1;" + std::to_string(static_cast<int>(color) +10) + "m";
+            }
+            std::string ComposeMessage(std::string Contents, LogColor TextColor, LogColor Background);
+            void Log_List(std::string Title, std::vector<std::string>& Content, LogColor TextColor = white, LogColor Background = black);
             void Log(std::string log, LogColor TextColor = white, LogColor Background = black);
 
             void Debug(std::string log);
