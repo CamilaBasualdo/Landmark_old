@@ -33,7 +33,22 @@
     <ClCompile Include="src\VK\Vulkan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\VK\DeviceManager.cpp">
+    <ClCompile Include="src\VK\Task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VK\Devices\Layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VK\Devices\Extension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VK\Devices\Device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VK\Devices\DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VK\VulkanEvents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +101,19 @@
     <ClInclude Include="src\Module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\VK\DeviceManager.h">
+    <ClInclude Include="src\VK\Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VK\Devices\Layer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VK\Devices\Extension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VK\Devices\DeviceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VK\Devices\Device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

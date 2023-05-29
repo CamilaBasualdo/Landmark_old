@@ -19,19 +19,25 @@ namespace Landmark
 		{
 			LOGGER.Log("Init");
 			
-			SubscribeTo<Vk::Event_VulkanQueuesPreInit>([&](Vk::Event_VulkanQueuesPreInit& e) {
+			
+
+
+
+			SubscribeTo<Vk::Event_GpuTaskRequest>([&](Vk::Event_GpuTaskRequest& e) {
+				//LOGGER.Log("Requesting Main Rendering Task on Device 0 (HARDCODED) Type: " + std::string(string_VkPhysicalDeviceType(e.AvailableDevices[0].deviceProperties.deviceType)));
 				
-				});
 
+				Vk::Event_GpuTaskRequest::TaskRequest request = {
+					"RenderLogic Main Rendering Task",
+					Vk::Task::TaskTypes::CONTINUOUS,
+					e.AvailableDevices[0].ID,
+					Vk::Task::GRAPHICS | Vk::Task::COMPUTE | Vk::Task::TRANSFER | Vk::Task::SPARSE_BINDING,
+					{VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME},
+					{}
 
+				};
 
-			SubscribeTo<Vk::Event_VulkanPhysicalDevicesPreInit>([&](Vk::Event_VulkanPhysicalDevicesPreInit& e) {
-				LOGGER.Log("Asking for Devices");
-				LOGGER.Log(std::string(string_VkPhysicalDeviceType(e.AvailableDevices[0].deviceProperties.deviceType)));
-				std::string EXtensions = "Device Extensions: \n";
-				for (auto ext : e.AvailableDevices[0].deviceExtensions)
-					EXtensions += std::string(" | ") + ext.extensionName + std::string(" \n");
-				LOGGER.Log(EXtensions);
+				RenderingTask = e.DeclareTask(request);
 				});
 			
 		}

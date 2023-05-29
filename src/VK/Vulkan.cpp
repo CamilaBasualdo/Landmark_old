@@ -1,6 +1,6 @@
 #include "Vulkan.h"
 #include <GLFW/glfw3.h>
-#include "DeviceManager.h"
+#include "Devices/DeviceManager.h"
 #include <sstream>
 #include <vulkan/vk_enum_string_helper.h>
 namespace Landmark
@@ -110,9 +110,9 @@ namespace Landmark
 			
 			InstanceInit();
 
-			DeviceManager::Init();
+			Devices::DeviceManager::Init();
 
-			vkDestroyInstance(_VkInstance, nullptr);
+		
 		}
 
 		void Vulkan::PostInit()
@@ -132,7 +132,7 @@ namespace Landmark
 
 			}
 			else
-				LOGGER.Log("GLFW Initialized!", LOGGER.green);
+				LOGGER.Log("GLFW Init", LOGGER.green);
 
 
 			LOGGER.Debug("Initializing Vulkan");
@@ -193,7 +193,7 @@ namespace Landmark
 
 			VkResult InstResult = vkCreateInstance(&createInfo, nullptr, &_VkInstance);
 			if (InstResult == VK_SUCCESS)
-				LOGGER.Log("Vulkan Initialized!", LOGGER.green);
+				LOGGER.Log("Vulkan Init", LOGGER.green);
 			else {
 				LOGGER.Critical("Vulkan Failed to Initialize!", false);
 				uint32_t extensionCount = 0;

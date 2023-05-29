@@ -88,16 +88,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\VK\DeviceManager.cpp" />
+    <ClCompile Include="src\VK\Devices\Device.cpp" />
+    <ClCompile Include="src\VK\Devices\DeviceManager.cpp" />
+    <ClCompile Include="src\VK\Devices\Extension.cpp" />
+    <ClCompile Include="src\VK\Devices\Layer.cpp" />
     <ClCompile Include="src\Debug\Debug.cpp" />
     <ClCompile Include="src\Debug\Logger.cpp" />
     <ClCompile Include="src\Landmark.cpp" />
     <ClCompile Include="src\Logic\RenderLogic.cpp" />
     <ClCompile Include="src\VK\Vulkan.cpp" />
+    <ClCompile Include="src\VK\VulkanEvents.cpp" />
     <ClCompile Include="src_demo\Demo.cpp" />
+    <ClCompile Include="src\VK\Task.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\VK\DeviceManager.h" />
+    <ClInclude Include="src\VK\Devices\Device.h" />
+    <ClInclude Include="src\VK\Devices\DeviceManager.h" />
+    <ClInclude Include="src\VK\Devices\Extension.h" />
+    <ClInclude Include="src\VK\Devices\Layer.h" />
     <ClInclude Include="include\GLFW\include\GLFW\glfw3.h" />
     <ClInclude Include="include\GLFW\include\GLFW\glfw3native.h" />
     <ClInclude Include="src\Component\Component.h" />
@@ -114,6 +122,7 @@
     <ClInclude Include="src\Landmark.h" />
     <ClInclude Include="src\Logic\RenderLogic.h" />
     <ClInclude Include="src\VK\Vulkan.h" />
+    <ClInclude Include="src\VK\Task.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

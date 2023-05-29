@@ -3,6 +3,7 @@
 #include "../VK/VulkanEvents.h"
 #include "../Module/Module.h"
 #include "../Debug/Debug.h"
+#include "../VK/Task.h"
 namespace Landmark
 {
 	namespace Render
@@ -14,12 +15,11 @@ namespace Landmark
 
 
 
-			void VulkanQueuesPreInitCallback(Vk::Event_VulkanQueuesPreInit& e) {
-
-			}
+			
 
 			static inline Debug::Logger LOGGER = Debug::Debugger::GetLogger("RenderSystem");
 
+			static inline Vk::Task* RenderingTask = nullptr;
 		public:
 		
 			RenderSystem();

@@ -9,14 +9,15 @@ namespace Landmark
 	class Engine;
 	namespace Vk
 	{
-		class DeviceManager;
+		namespace Devices { class DeviceManager; }
+		
 		struct VulkanInitParameters {
 			const char* AppName = nullptr;
 			bool ValidationMode = false;
 		};
 		class Vulkan :Module, Events::EventDispatcher {
 			friend Engine;
-			friend DeviceManager;
+			friend Devices::DeviceManager;
 			static inline Debug::Logger LOGGER = Debug::Debugger::GetLogger("Vulkan");
 
 
