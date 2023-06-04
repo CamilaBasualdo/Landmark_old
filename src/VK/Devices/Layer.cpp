@@ -1,6 +1,6 @@
 #include "Layer.h"
 
-Landmark::Vk::Devices::Layer::Layer(VkLayerProperties _prop)
+Landmark::Vk::Layer::Layer(VkLayerProperties _prop)
 :Properties(_prop),
 Name(_prop.layerName),
 Description(_prop.description),

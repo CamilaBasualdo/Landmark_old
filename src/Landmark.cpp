@@ -1,47 +1,126 @@
 #include "Landmark.h"
 
-#include "Debug/Debug.h"
+
 #include "Module/Module.h"
-#include "Logic/RenderLogic.h"
+#include "Renderer/Renderer.h"
+#include "IO/WindowManager.h"
+
+#include "Debug/LogSystem.h"
+#include "Time/Time.h"
+#include "Audio/AudioSystem.h"
+#include <thread>
 namespace Landmark
 {
-
-	void Engine::Init(EngineInitParameters p)
+	void Engine::DefaultModulesAttach()
 	{
-		
+		//AttachModule<Threads::ThreadManager>();
+		AttachModule<Vk::Vulkan>();
+		AttachModule<Render::Renderer>();
+		AttachModule<IO::WindowManager>();
+		AttachModule<Time>();
+		AttachModule<Audio::AudioSystem>();
+	}
+
+	void Engine::InitializationProcess()
+	{
+		LogSystem::Init();
+		LogSystem::Log(std::string(Logo32) + "\n");
 
 
+#ifdef _DEBUG
+		//makes it look real cool
+		std::cout << Logo32 << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+#endif
+		if (InitializationParameters.IncludeDefaultModules) DefaultModulesAttach();
 
-		
-
-		//LOGGER.Log("Test Log", LOGGER.white, LOGGER.green);
-		//LOGGER.Debug("Test Debug");
-		//LOGGER.Warning("Test Warning");
-		//LOGGER.Error("Test Error");
-		//LOGGER.Critical("Test Critical\n");
+		LOGGER.Debug("Engine Init");
 
 
-		LOGGER.Debug("Engine Init!");
-		Vk::VulkanInitParameters VkInitParams;
-		VkInitParams.AppName = p.AppName;
-		VkInitParams.ValidationMode = p.DebugMode;
-		AttachModule<Vk::Vulkan>(VkInitParams);
-		AttachModule<Vk::Vulkan>(VkInitParams );
-		AttachModule<Render::RenderSystem>();
-
-		LOGGER.Debug("Modules Init Stage 1!");
+		LOGGER.Debug("Init Stage 1");
 		for (auto M : _EngineModules)
 			M.second->PreInit();
 
-		LOGGER.Debug("Modules Init Stage 2!");
+		LOGGER.Debug("Init Stage 2");
 		for (auto M : _EngineModules)
 			M.second->Init();
 
 
-		LOGGER.Debug("Modules Init Stage 3!");
+		LOGGER.Debug("Init Stage 3");
 		for (auto M : _EngineModules)
 			M.second->PostInit();
-
 	}
 
+	void Engine::UpdateProcess()
+	{
+		LOGGER.Log("Update Loop");
+		while (!ShouldShutdown)
+		{
+			// Start measuring the loop execution time
+			auto startTime = std::chrono::steady_clock::now();
+
+			// Your loop code goes here
+			// ...
+			for (auto M : _EngineModules)
+				M.second->Update();
+
+			// Calculate the elapsed time for the loop iteration
+			auto endTime = std::chrono::steady_clock::now();
+			auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(endTime - startTime);
+
+			static std::chrono::duration<double> loopDuration(1.0 / InitializationParameters.UpdateRateHz);
+
+			// Sleep for the remaining time to achieve the desired frequency
+			std::chrono::duration<double> sleepDuration = loopDuration - elapsedTime;
+			if (sleepDuration > std::chrono::duration<double>(0))
+				std::this_thread::sleep_for(sleepDuration);
+
+
+
+		}
+	}
+
+	void Engine::ShutdownProcess()
+	{
+		LOGGER.Log("Shutting Down...");
+
+		LOGGER.Log("Exit Stage 1");
+		for (auto M : _EngineModules)
+			M.second->PreExit();
+		LOGGER.Log("Exit Stage 2");
+		for (auto M : _EngineModules)
+			M.second->Exit();
+		LOGGER.Log("Exit Stage 3");
+		for (auto M : _EngineModules)
+			M.second->PostExit();
+
+
+		LOGGER.Log("Goodbye!");
+
+		LogSystem::Shutdown();
+	}
+
+	void Engine::Init(EngineInitParameters p) 
+	{
+		InitializationParameters = p;
+		InitializationProcess();
+
+		UpdateProcess();
+
+		ShutdownProcess();
+
+		
+	}
+
+
+
+	void Engine::Shutdown()
+	{
+		if (!ShouldShutdown)
+		{
+			ShouldShutdown = true;
+			LOGGER.Log("Shutdown Called");
+		}
+		
+	}
 }

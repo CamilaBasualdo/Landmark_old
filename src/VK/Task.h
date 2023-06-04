@@ -1,5 +1,5 @@
 #pragma once
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 #include <string>
 namespace Landmark {
 	namespace Vk {
@@ -9,11 +9,7 @@ namespace Landmark {
 		{
 			
 		public:
-			struct TaskInfo {
-				std::string Name;
-				VkQueue queue;
-				VkDevice device;
-			};
+			using CapabilitiesMask = uint8_t;
 			enum TaskTypes {
 				INVALID = -1,
 				CONTINUOUS = 0,
@@ -23,21 +19,23 @@ namespace Landmark {
 			const TaskTypes taskType;
 
 			enum Capabilities {
-				GRAPHICS = VK_QUEUE_GRAPHICS_BIT,
-				COMPUTE = VK_QUEUE_COMPUTE_BIT,
-				TRANSFER = VK_QUEUE_TRANSFER_BIT,
-				SPARSE_BINDING = VK_QUEUE_SPARSE_BINDING_BIT,
+				PRESENT = 0b0,
+				GRAPHICS = 0b10,
+				COMPUTE =0b100,
+				TRANSFER=0b1000,
+				SPARSE_BINDING=0b10000 
 			};
 		private:
-			TaskInfo _taskinfo;
+			//TaskInfo _taskinfo;
 			bool Initialized = false;
-			uint8_t CapabilitiesRequested = 0;
-			uint8_t CapabilitiesAvailable = 0;
+			
+			CapabilitiesMask Capabilities = 0;
 
 		protected:
-			Task(TaskTypes _type);
-			void Initiaize(TaskInfo _info);
+			
+			void Initiaize();
 		public:
+			Task(TaskTypes _type);
 			bool IsInitialized() { return Initialized; }
 			void Begin();
 

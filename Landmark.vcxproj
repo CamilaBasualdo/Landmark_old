@@ -57,14 +57,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_VULKAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\include;D:\Dropbox\Landmark\include\GLFW\include;D:\Dropbox\Landmark\include\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\GLFW\include;$(VULKAN_SDK)\include;$(SolutionDir)include\OpenAL\include;D:\Dropbox\Landmark\include\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Dropbox\Landmark\include\GLFW\lib;$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;vulkan-1.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\GLFW\lib;$(SolutionDir)include\OpenAL\libs\Win64;$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;vulkan-1.lib;OpenAL32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -75,7 +75,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;GLFW_INCLUDE_VULKAN%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\include;D:\Dropbox\Landmark\include\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\GLFW\include;$(VULKAN_SDK)\include;$(SolutionDir)include\OpenAL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -83,25 +83,44 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Dropbox\Landmark\include\GLFW\lib;$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;vulkan-1.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\GLFW\lib;$(SolutionDir)include\OpenAL\libs\Win64;$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;vulkan-1.lib;OpenAL32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Audio\AudioSystem.cpp" />
+    <ClCompile Include="src\Audio\AudioDevice.cpp" />
+    <ClCompile Include="src\Debug\LogSystem.cpp" />
+    <ClCompile Include="src\IO\Window.cpp" />
+    <ClCompile Include="src\IO\WindowManager.cpp" />
+    <ClCompile Include="src\Shader\Shader.cpp" />
+    <ClCompile Include="src\Time\Time.cpp" />
     <ClCompile Include="src\VK\Devices\Device.cpp" />
     <ClCompile Include="src\VK\Devices\DeviceManager.cpp" />
     <ClCompile Include="src\VK\Devices\Extension.cpp" />
     <ClCompile Include="src\VK\Devices\Layer.cpp" />
-    <ClCompile Include="src\Debug\Debug.cpp" />
-    <ClCompile Include="src\Debug\Logger.cpp" />
+    <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Landmark.cpp" />
-    <ClCompile Include="src\Logic\RenderLogic.cpp" />
+    <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\VK\Vulkan.cpp" />
     <ClCompile Include="src\VK\VulkanEvents.cpp" />
     <ClCompile Include="src_demo\Demo.cpp" />
     <ClCompile Include="src\VK\Task.cpp" />
+    <ClCompile Include="src\VK\TaskRequester.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OpenAL\include\al.h" />
+    <ClInclude Include="include\OpenAL\include\alc.h" />
+    <ClInclude Include="include\OpenAL\include\efx-creative.h" />
+    <ClInclude Include="include\OpenAL\include\EFX-Util.h" />
+    <ClInclude Include="include\OpenAL\include\efx.h" />
+    <ClInclude Include="include\OpenAL\include\xram.h" />
+    <ClInclude Include="src\Audio\AudioSystem.h" />
+    <ClInclude Include="src\Audio\AudioDevice.h" />
+    <ClInclude Include="src\Debug\LogSystem.h" />
+    <ClInclude Include="src\IO\WindowManager.h" />
+    <ClInclude Include="src\Shader\Shader.h" />
+    <ClInclude Include="src\Time\Time.h" />
     <ClInclude Include="src\VK\Devices\Device.h" />
     <ClInclude Include="src\VK\Devices\DeviceManager.h" />
     <ClInclude Include="src\VK\Devices\Extension.h" />
@@ -111,18 +130,21 @@
     <ClInclude Include="src\Component\Component.h" />
     <ClInclude Include="src\Containers\BetterOctree.h" />
     <ClInclude Include="src\Containers\lobby.h" />
-    <ClInclude Include="src\Debug\Debug.h" />
-    <ClInclude Include="src\Debug\Logger.h" />
+    <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Entity\Entity.h" />
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\EventSystem.h" />
     <ClInclude Include="src\Module\Module.h" />
     <ClInclude Include="src\VK\VulkanEvents.h" />
-    <ClInclude Include="src\IO\Windows.h" />
+    <ClInclude Include="src\IO\Window.h" />
     <ClInclude Include="src\Landmark.h" />
-    <ClInclude Include="src\Logic\RenderLogic.h" />
+    <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\VK\Vulkan.h" />
     <ClInclude Include="src\VK\Task.h" />
+    <ClInclude Include="src\VK\TaskRequester.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="include\OpenAL\libs\Win64\OpenAL32.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

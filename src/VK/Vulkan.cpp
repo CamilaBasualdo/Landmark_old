@@ -1,4 +1,5 @@
 #include "Vulkan.h"
+
 #include <GLFW/glfw3.h>
 #include "Devices/DeviceManager.h"
 #include <sstream>
@@ -66,7 +67,7 @@ namespace Landmark
 		}
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL VulkankValidationCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,VkDebugUtilsMessageTypeFlagsEXT messageType,const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,void* pUserData) {
-			static Debug::Logger _logger = Debug::Debugger::GetLogger("Vulkan Validation");
+			static Logger _logger = Logger("Vulkan Validation");
 
 			auto ss = VulkanValidationLogFormat(pCallbackData);
 			
@@ -110,7 +111,7 @@ namespace Landmark
 			
 			InstanceInit();
 
-			Devices::DeviceManager::Init();
+			DeviceManager::Init();
 
 		
 		}
@@ -122,7 +123,7 @@ namespace Landmark
 		
 		void Vulkan::InstanceInit()
 		{
-			auto EventReturn = DispatchEvent<Event_VulkanInstancePreInit>();
+			auto EventReturn = Dispatch<Event_VulkanInstancePreInit>();
 			LOGGER.Debug("Initializing GLFW");
 			if (!glfwInit()) {
 				const char* Desc;
@@ -132,7 +133,7 @@ namespace Landmark
 
 			}
 			else
-				LOGGER.Log("GLFW Init", LOGGER.green);
+				LOGGER.Log("GLFW Init");
 
 
 			LOGGER.Debug("Initializing Vulkan");
@@ -176,24 +177,28 @@ namespace Landmark
 			LOGGER.Log(ExtensionsString);
 
 			std::vector<const char*> ValidationLayers = {};
-			if (InitializationParameters.ValidationMode) {
-				ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
-				createInfo.enabledLayerCount = ValidationLayers.size();
-				createInfo.ppEnabledLayerNames = ValidationLayers.data();
+#ifdef _DEBUG
+			ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
+			createInfo.enabledLayerCount = ValidationLayers.size();
+			createInfo.ppEnabledLayerNames = ValidationLayers.data();
 
-				std::string LayerText = "Requested Vulkan Layers: \n\n";
-				for (auto layer : ValidationLayers)
-					LayerText += " | " + std::string(layer) + "\n";
-				LOGGER.Log(LayerText);
-			}
-			else createInfo.enabledLayerCount = 0;
+			std::string LayerText = "Requested Vulkan Layers: \n\n";
+			for (auto layer : ValidationLayers)
+				LayerText += " | " + std::string(layer) + "\n";
+			LOGGER.Log(LayerText);
+
+#elif
+			createInfo.enabledLayerCount = 0;
+
+#endif
+			
 
 
 
 
 			VkResult InstResult = vkCreateInstance(&createInfo, nullptr, &_VkInstance);
 			if (InstResult == VK_SUCCESS)
-				LOGGER.Log("Vulkan Init", LOGGER.green);
+				LOGGER.Log("Vulkan Init");
 			else {
 				LOGGER.Critical("Vulkan Failed to Initialize!", false);
 				uint32_t extensionCount = 0;

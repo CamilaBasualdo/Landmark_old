@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 #include <vector>
 #include "Extension.h"
 #include "Layer.h"
@@ -8,10 +8,12 @@ namespace Landmark
 {
 	namespace Vk
 	{
-		namespace Devices
-		{
+		class Task;
+		
+			class DeviceManager;
 			class Device
 			{
+				friend DeviceManager;
 				
 			public:
 				using DeviceID = uint64_t;
@@ -36,14 +38,14 @@ namespace Landmark
 
 				const std::vector<Extension> AvailableExtensions;
 				const std::vector<Layer> AvailableLayer;
-
-
+			private:
+				std::vector<Task*> Tasks;
+			protected:
 				Device(VkPhysicalDevice _PhysicalDevice);
-
 				
 			};
 
-		}
+		
 		
 		
 

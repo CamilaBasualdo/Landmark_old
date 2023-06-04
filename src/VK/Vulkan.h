@@ -1,32 +1,37 @@
 #pragma once
-
+#include <vulkan/vulkan.hpp>
 #include <iostream>
 #include "../Events/EventSystem.h"
 #include "VulkanEvents.h"
 #include "../Module/Module.h"
+#include "../Logger.h"
 namespace Landmark
 {
 	class Engine;
+	namespace IO { class Window; }
 	namespace Vk
 	{
-		namespace Devices { class DeviceManager; }
+		 class DeviceManager;
 		
-		struct VulkanInitParameters {
-			const char* AppName = nullptr;
-			bool ValidationMode = false;
-		};
+
 		class Vulkan :Module, Events::EventDispatcher {
 			friend Engine;
-			friend Devices::DeviceManager;
-			static inline Debug::Logger LOGGER = Debug::Debugger::GetLogger("Vulkan");
+
+			friend DeviceManager;
+			friend IO::Window;
+			static inline Logger LOGGER = Logger("Vulkan");
 
 
 			static inline VkInstance _VkInstance;
+
 			static inline VkDebugUtilsMessengerEXT debugMessenger;
-			Vulkan(VulkanInitParameters _p) :InitializationParameters(_p){
+
+
+
+			Vulkan() {
 
 			}
-			const VulkanInitParameters InitializationParameters;
+			
 			void InstanceInit();
 		protected:
 			static VkInstance& GetVkInstance() { return _VkInstance; }

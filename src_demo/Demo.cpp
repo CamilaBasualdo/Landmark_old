@@ -1,10 +1,7 @@
-#include <thread>
-#include <iostream>
-#include <vector>
-#include <GLFW/glfw3.h>
+
 #include "../src/Landmark.h"
-#include "../src/Logic/RenderLogic.h"
-#include <Windows.h>
+
+
 #include <functional>
 #include "../src/Containers/lobby.h"
 #include <vector>
@@ -13,6 +10,7 @@
 #ifdef _DEBUG
 #define APPSTART int main(void)
 #else
+#include <Windows.h>
 #define APPSTART int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 #endif
 

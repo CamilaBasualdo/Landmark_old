@@ -4,6 +4,6 @@ Landmark::Vk::Task::Task(TaskTypes _type): taskType(_type)
 {
 }
 
-void Landmark::Vk::Task::Initiaize(TaskInfo _info)
+void Landmark::Vk::Task::Initiaize()
 {
 }

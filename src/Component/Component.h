@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Containers/lobby.h"
-#include "../Debug/Debug.h"
+#include "../Logger.h"
 #include <typeinfo>
 #include <string>
 namespace Landmark {
@@ -54,7 +54,7 @@ namespace Landmark {
 				return Controller::NewComponent();
 			}
 			static void Destroy(lobby<T>::address _address);
-			static Debug::Logger LOGGER;
+			static inline Logger LOGGER = Logger(std::string(typeid(T).name()).substr(6));
 
 			// Inherited via _Base_Component
 
@@ -63,5 +63,5 @@ namespace Landmark {
 	}
 }
 
-template<class T>
-Landmark::Debug::Logger Landmark::ECS::Component<T>::LOGGER = Debug::Debugger::GetLogger(std::string(typeid(T).name()).substr(6));
+//template<class T>
+//Landmark::Debug::Logger Landmark::ECS::Component<T>::LOGGER = Debug::Debugger::GetLogger(std::string(typeid(T).name()).substr(6));

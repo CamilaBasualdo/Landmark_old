@@ -17,8 +17,14 @@ namespace Landmark {
 		virtual std::string GetName() const = 0;
 
 		
-		virtual void PreInit() = 0;
-		virtual void Init() = 0;
-		virtual void PostInit() = 0;
+		virtual void PreInit(){};
+		virtual void Init(){};
+		virtual void PostInit() {};
+
+		virtual void Update() {};
+
+		virtual void PreExit() {};
+		virtual void Exit() {};
+		virtual void PostExit() {};
 	};
 }

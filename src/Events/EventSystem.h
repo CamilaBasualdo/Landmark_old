@@ -2,14 +2,13 @@
 #include <functional>
 
 
-#include <list>
-#include "../Containers/lobby.h"
+
 #include "Event.h"
 #include <map>
-#include <unordered_map>
+
 #include <vector>
 #include <memory>
-#include "../Debug/Debug.h"
+#include "../Logger.h"
 #include <typeindex>
 #include <typeinfo>
 
@@ -63,7 +62,7 @@ namespace Landmark
 			friend class EventDispatcher;
 			friend class EventSubscriber;
 			static inline std::map<const std::type_info*, EventHandlerBase*> EventHandlers = {};
-			static inline Debug::Logger _EventSystem_Logger = Debug::Debugger::GetLogger("EventSystem");
+			static inline Logger _EventSystem_Logger = Logger("EventSystem");
 
 		protected:
 			template <typename T>
@@ -112,14 +111,14 @@ namespace Landmark
 		public:
 			template <typename T, typename... Args>
 			static TemplateEventBaseCheck(T)
-				DispatchEvent(Args&&... args) {
+				Dispatch(Args&&... args) {
 				T _event = T(std::forward<Args>(args)...);
 				EventSystem::Dispatch<T>(_event);
 				return _event;
 			}
 			template <typename T>
 			static TemplateEventBaseCheck(T)
-				DispatchEvent() {
+				Dispatch() {
 				T _event = T();
 				 EventSystem::Dispatch<T>(_event);
 				 return _event;
