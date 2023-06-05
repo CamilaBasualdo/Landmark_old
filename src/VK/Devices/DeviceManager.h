@@ -26,7 +26,7 @@ namespace Landmark {
 
 
 
-			static void InitializeTasks(Event_GpuTaskRequest e);
+			static void InitializeTasks();
 
 			static void EnumerateDevices();
 

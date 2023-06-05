@@ -98,7 +98,11 @@ namespace Landmark
 						std::pair<std::type_info*, std::unique_ptr<EventHandlerBase>>
 						(type, std::make_unique< EventHandler<T>>() ));*/
 				}
-				else Handler = dynamic_cast<EventHandler<T>*>( EventHandlers[type]);
+				else {
+					auto rawHandler = EventHandlers[type];
+					Handler = reinterpret_cast<EventHandler<T>*>(rawHandler);
+					rawHandler;
+				}
 				
 				Handler->addSubscriber(callback);
 				_EventSystem_Logger.Log("New Subscription to " + std::string(type->name()).substr(6));

@@ -23,7 +23,7 @@ namespace Landmark
 		public:
 			struct TaskRequest {
 				const std::string Name = "Default Task Name";
-				const Task::TaskTypes _type = Task::TaskTypes::INVALID;
+				const Task::TaskIntensities _type = Task::TaskIntensities::INVALID;
 				const int DeviceID = -1;
 				uint8_t RequestedCapabilities = 0b000000;
 				const char Extensions[VK_MAX_EXTENSION_NAME_SIZE][50] = { {0} };

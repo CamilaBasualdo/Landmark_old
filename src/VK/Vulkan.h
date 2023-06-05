@@ -42,6 +42,9 @@ namespace Landmark
 			virtual void PreInit() override;
 			virtual void Init() override;
 			virtual void PostInit() override;
+
+		public:
+			void Update() override;
 		};
 
 

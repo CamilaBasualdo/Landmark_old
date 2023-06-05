@@ -6,12 +6,15 @@
 class GLFWwindow;
 namespace Landmark
 {
+	namespace Vk { class Device; class DeviceManager; }
 	namespace IO
 	{
 		class WindowManager;
 		class Window
 		{
 			friend WindowManager;
+			friend Vk::DeviceManager;
+			friend Vk::Device;
 			enum Type
 			{
 				
@@ -24,6 +27,8 @@ namespace Landmark
 
 		private:
 			Window();
+		protected:
+			VkSurfaceKHR GetSurface() { return _Surface; };
 		public:
 			
 
@@ -32,6 +37,8 @@ namespace Landmark
 
 			void SwapBuffers();
 			static void PollEvents();
+
+			void MakeCurrent(); 
 		};
 		
 	}

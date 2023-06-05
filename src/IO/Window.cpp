@@ -47,3 +47,8 @@ void Landmark::IO::Window::PollEvents()
 {
 	glfwPollEvents();
 }
+
+void Landmark::IO::Window::MakeCurrent()
+{
+	glfwMakeContextCurrent(_Window);
+}

@@ -104,23 +104,34 @@ namespace Landmark
 
 		void Vulkan::PreInit()
 		{
+			InstanceInit();
+
+			
 		}
 
 		void Vulkan::Init()
 		{
 			
-			InstanceInit();
-
-			DeviceManager::Init();
+			
 
 		
 		}
 
 		void Vulkan::PostInit()
 		{
+			DeviceManager::Init();
 		}
-		
-		
+
+		void Vulkan::Update()
+		{
+			glfwPollEvents();
+		}
+
+		void GLFW_ErrorCabllack(int errorcode, const char* desc)
+		{
+			static Logger _GlfwLogger = Logger("GLFW");
+			_GlfwLogger.Log(desc);
+		}
 		void Vulkan::InstanceInit()
 		{
 			auto EventReturn = Dispatch<Event_VulkanInstancePreInit>();
@@ -133,7 +144,11 @@ namespace Landmark
 
 			}
 			else
+			{
 				LOGGER.Log("GLFW Init");
+				glfwSetErrorCallback(GLFW_ErrorCabllack);
+			}
+				
 
 
 			LOGGER.Debug("Initializing Vulkan");

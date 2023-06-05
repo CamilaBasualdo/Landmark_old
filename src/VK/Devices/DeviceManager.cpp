@@ -37,49 +37,83 @@ namespace Landmark
 			LOGGER.Log("Init");
 			EnumerateDevices();
 
-
-			Event_GpuTaskRequest e = Dispatch<Event_GpuTaskRequest>();
+			InitializeTasks();
 
 		}
 
+		
 
 
-
-		void DeviceManager::InitializeTasks(Event_GpuTaskRequest e)
+		void DeviceManager::InitializeTasks()
 		{
-
+			Event_GpuTaskRequest e = Dispatch<Event_GpuTaskRequest>();
 			auto Requests = e.GetRequests();
 
 
 			for (auto DeviceRequests : Requests) {
 				std::vector<std::string> DeviceRequestsLog = {};
 
+				//8 graphics + present queues == [0b11] -> 800
+
+				//for every task
+
+				std::map<Task::CapabilitiesMask, int>CapacityRequested;
 				for (auto Request : DeviceRequests.second) {
-					std::string RequestInfo = "";
-					RequestInfo += "Request for (" + Request._ShallowRequest.Name + ")";
 
-
-					RequestInfo += "\n	Type: ";
-					switch (Request._ShallowRequest._type) {
-					case Task::INVALID: break;
-					case Task::CONTINUOUS: RequestInfo += "Continuous"; break;
-					case Task::BURST: RequestInfo += "Burst"; break;
-					case Task::SLEEPER:RequestInfo += "Sleeper"; break;
-					default:;
-					}
-					RequestInfo += "\n	Capabilities: ";
 					auto Capabilities = Request._ShallowRequest.RequestedCapabilities;
-					if (Capabilities & Task::GRAPHICS) RequestInfo += "Graphics | ";
-					if (Capabilities & Task::COMPUTE) RequestInfo += "Compute | ";
-					if (Capabilities & Task::TRANSFER) RequestInfo += "Transfer | ";
-					if (Capabilities & Task::SPARSE_BINDING) RequestInfo += "Sparse Binding | ";
+					auto DeviceCapabilities = Devices.at(Request._ShallowRequest.DeviceID).QueueCapability;
+
+					//Logging Info
+					{
+						std::string RequestInfo = "";
+						RequestInfo += "" + Request._ShallowRequest.Name + ":";
 
 
+						RequestInfo += "\n	Intensity: ";
+						switch (Request._ShallowRequest._type) {
+						case Task::INVALID: break;
+						case Task::VERY_HIGH: RequestInfo += "Very High"; break;
+						case Task::HIGH: RequestInfo += "High"; break;
+						case Task::MEDIUM:RequestInfo += "Medium"; break;
+						case Task::LOW:RequestInfo += "Low"; break;
+						default:;
+						}
+						RequestInfo += "\n	Capabilities: ";
 
-					DeviceRequestsLog.push_back(RequestInfo);
+						if (Capabilities & Task::PRESENT) RequestInfo += "Present | ";
+						if (Capabilities & Task::GRAPHICS) RequestInfo += "Graphics | ";
+						if (Capabilities & Task::COMPUTE) RequestInfo += "Compute | ";
+						if (Capabilities & Task::TRANSFER) RequestInfo += "Transfer | ";
+						if (Capabilities & Task::SPARSE_BINDING) RequestInfo += "Sparse Binding | ";
+
+						DeviceRequestsLog.push_back(RequestInfo);
+					}
+
+					if (!CapacityRequested.contains(Capabilities))
+						CapacityRequested[Capabilities] = 0;
+
+
+					CapacityRequested[Capabilities] += static_cast<int>(Request._ShallowRequest._type);
+
+
+					
 				}
 
-				//LOGGER.Log_List("Device " + std::to_string(DeviceRequests.first) + " (" + std::string(Devices[DeviceRequests.first]._Info.Name) + ") Requests:", DeviceRequestsLog);
+				//LOGGING
+				{
+					LOGGER.Log_List("Device " + std::to_string(DeviceRequests.first) +
+						" (" + std::string((Devices.at(DeviceRequests.first).Name)) + ") Requests:",
+						DeviceRequestsLog);
+					for (auto Re : CapacityRequested)
+					{
+						LOGGER.Log("Queue Capability: " + std::to_string(Re.first) + " usage: " + std::to_string(Re.second) + "%");
+					}
+				}
+
+
+
+
+
 			}
 
 

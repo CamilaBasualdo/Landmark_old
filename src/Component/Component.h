@@ -34,7 +34,7 @@ namespace Landmark {
 
 		private:
 			lobby<T>::address ComponentAddress;
-
+			lobby<Entity>::address OwnerAddress;
 			
 			
 		protected:

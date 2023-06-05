@@ -1,14 +1,16 @@
 #pragma once
+#include <map>
 #include <string>
 #include <vulkan/vulkan.hpp>
 #include <vector>
 #include "Extension.h"
 #include "Layer.h"
+#include "../Task.h"
 namespace Landmark
 {
 	namespace Vk
 	{
-		class Task;
+		
 		
 			class DeviceManager;
 			class Device
@@ -27,6 +29,8 @@ namespace Landmark
 				};
 
 				static std::string DeviceTypes_toString(DeviceTypes _type);
+				
+
 
 				const VkPhysicalDevice PhysicalDevice;
 				const VkPhysicalDeviceProperties Properties;
@@ -38,8 +42,16 @@ namespace Landmark
 
 				const std::vector<Extension> AvailableExtensions;
 				const std::vector<Layer> AvailableLayer;
+
+				const std::map<Task::CapabilitiesMask, int> QueueCapability;
+
 			private:
 				std::vector<Task*> Tasks;
+
+				const std::vector<Extension> GetExtensions();
+				const std::vector<Layer> GetLayers();
+				const std::map<Task::CapabilitiesMask, int> GetQueueCapacities();
+
 			protected:
 				Device(VkPhysicalDevice _PhysicalDevice);
 				

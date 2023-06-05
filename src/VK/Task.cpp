@@ -1,6 +1,6 @@
 #include "Task.h"
 
-Landmark::Vk::Task::Task(TaskTypes _type): taskType(_type)
+Landmark::Vk::Task::Task(TaskIntensities _type): taskType(_type)
 {
 }
 
