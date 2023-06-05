@@ -56,12 +56,12 @@ namespace Landmark
 				//8 graphics + present queues == [0b11] -> 800
 
 				//for every task
-
+				auto DeviceCapabilities = Devices.at(DeviceRequests.first).QueueCapability;
 				std::map<Task::CapabilitiesMask, int>CapacityRequested;
 				for (auto Request : DeviceRequests.second) {
 
 					auto Capabilities = Request._ShallowRequest.RequestedCapabilities;
-					auto DeviceCapabilities = Devices.at(Request._ShallowRequest.DeviceID).QueueCapability;
+					
 
 					//Logging Info
 					{
@@ -109,9 +109,21 @@ namespace Landmark
 						LOGGER.Log("Queue Capability: " + std::to_string(Re.first) + " usage: " + std::to_string(Re.second) + "%");
 					}
 				}
+				std::vector<std::string> CapabilitiesList;
+				for (auto Capability : DeviceCapabilities)
+				{
+					std::string CapabilityLog = "(" + std::to_string(Capability.second/100) + ") | " + std::to_string(Capability.second) + "%";
 
+					CapabilityLog += "| ";
+					if (Capability.first & Task::GRAPHICS) CapabilityLog += "GRAPHICS | ";
+					if (Capability.first & Task::COMPUTE) CapabilityLog += "COMPUTE | ";
+					if (Capability.first & Task::PRESENT) CapabilityLog += "PRESENT | ";
+					if (Capability.first & Task::TRANSFER) CapabilityLog += "TRANSFER | " ;
+					if (Capability.first & Task::SPARSE_BINDING) CapabilityLog += "SPARSE_BINDING | ";
 
-
+					CapabilitiesList.push_back(CapabilityLog);
+				}
+				LOGGER.Log_List(Devices.at(DeviceRequests.first).Name + " | Queue Capabilities", CapabilitiesList);
 
 
 			}

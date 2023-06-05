@@ -53,7 +53,7 @@ namespace Landmark
 			vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
 
-			for (int i =0 ; i < queueFamilyCount;i++)
+			for (int i = 0; i < queueFamilyCount; i++)
 			{
 				auto family = queueFamilies[i];
 				Task::CapabilitiesMask Mask = 0b0;
@@ -63,16 +63,18 @@ namespace Landmark
 				if (family.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT) Mask |= Task::SPARSE_BINDING;
 
 				VkBool32 PresentSupport = VK_FALSE;
-				auto Windows= IO::WindowManager::GetWindows();
+				auto Windows = IO::WindowManager::GetWindows();
 				for (auto window : Windows)
 				{
 					vkGetPhysicalDeviceSurfaceSupportKHR(PhysicalDevice, i, window.GetSurface(), &PresentSupport);
 					if (PresentSupport) break;
 				}
 				if (PresentSupport == VK_TRUE) Mask |= Task::PRESENT;
+				if (!_Capabilities.contains(Mask))
+					_Capabilities[Mask] = 0;
 
-				_Capabilities[Mask] = family.queueCount * 100;
-				
+				_Capabilities[Mask] += family.queueCount * 100;
+
 			}
 			return _Capabilities;
 		}
@@ -87,7 +89,7 @@ namespace Landmark
 
 			AvailableExtensions([this]() {return GetExtensions(); }()),
 			AvailableLayer([this]() {return GetLayers(); }()),
-			QueueCapability([this](){return GetQueueCapacities();}())
+			QueueCapability([this]() {return GetQueueCapacities(); }())
 
 		{
 
