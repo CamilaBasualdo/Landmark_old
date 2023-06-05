@@ -75,17 +75,8 @@
     <ClCompile Include="src\Audio\AudioListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\OpenAL\test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\GLFW\include\GLFW\glfw3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GLFW\include\GLFW\glfw3native.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Landmark.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -182,8 +173,15 @@
     <ClInclude Include="src\Audio\AudioListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GLFW\include\GLFW\glfw3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GLFW\include\GLFW\glfw3native.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="include\OpenAL\libs\Win64\OpenAL32.lib" />
+    <Library Include="include\GLFW\lib\glfw3.lib" />
   </ItemGroup>
 </Project>
