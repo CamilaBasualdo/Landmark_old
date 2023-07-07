@@ -17,6 +17,10 @@ namespace Landmark::IO
 	{
 
 		static inline Vk::Task* PresentTask = nullptr;
+		static inline Window* _MainWindow = nullptr;
+
+		static inline Logger LOGGER = Logger("WindowManager");
+
 	public:
 		WindowManager();
 		std::string GetName() const override { return "WindowManager"; }
@@ -26,7 +30,13 @@ namespace Landmark::IO
 
 		static inline std::list<Window> _Windows;
 		static Window* CreateWindow();
+		static void DestroyWindow(Window* _window);
 		static const std::list<Window>& GetWindows() { return _Windows; }
+
+		static Window& MainWindow() { return *_MainWindow; }
+
+		
+		void Update() override;
 	};
 }
 

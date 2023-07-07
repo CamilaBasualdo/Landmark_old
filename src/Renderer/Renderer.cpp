@@ -42,8 +42,8 @@ namespace Landmark
 				Vk::Event_GpuTaskRequest::TaskRequest request = {
 					"Renderer Main Task",
 					Vk::Task::TaskIntensities::VERY_HIGH,
-					e.AvailableDevices[0].ID,
-					Vk::Task::GRAPHICS | Vk::Task::COMPUTE | Vk::Task::TRANSFER | Vk::Task::SPARSE_BINDING,
+					e.AvailableDevices[0].DeviceID,
+					Vk::GRAPHICS | Vk::COMPUTE | Vk::TRANSFER | Vk::SPARSE_BINDING,
 					{VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME},
 					{}
 
@@ -51,15 +51,16 @@ namespace Landmark
 
 				RenderingTask = e.DeclareTask(request);
 				});
-			MainWindow = IO::WindowManager::CreateWindow();
-			RenderingThread = std::thread(RenderingThreadStart);
-			LOGGER.Log("Rendering Thread Dispatched");
+			
+			
+			
 			///RenderingThread.join();
 			
 		}
 		void Renderer::Init() 		
 		{
-			
+			RenderingThread = std::thread(RenderingThreadStart);
+			LOGGER.Log("Rendering Thread Dispatched");
 		}
 		void Renderer::PostInit() 
 		{
@@ -74,7 +75,7 @@ namespace Landmark
 
 			while (!CloseThread)
 			{
-				if (MainWindow->GetShouldClose())
+				if (IO::WindowManager::MainWindow().GetShouldClose())
 					Engine::Shutdown();
 			}
 		}

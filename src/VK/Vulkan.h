@@ -34,7 +34,7 @@ namespace Landmark
 			
 			void InstanceInit();
 		protected:
-			static VkInstance& GetVkInstance() { return _VkInstance; }
+			
 			
 
 			// Inherited via Module
@@ -44,6 +44,7 @@ namespace Landmark
 			virtual void PostInit() override;
 
 		public:
+			static VkInstance& GetVkInstance() { return _VkInstance; }
 			void Update() override;
 		};
 

@@ -23,7 +23,7 @@ namespace Landmark::Render
 		static inline Logger LOGGER = Logger("Renderer");
 
 		static inline Vk::Task* RenderingTask = nullptr;
-		static inline IO::Window* MainWindow = nullptr;
+		
 		static inline std::thread RenderingThread;
 
 		static inline bool CloseThread = false;

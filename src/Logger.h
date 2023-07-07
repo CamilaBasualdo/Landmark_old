@@ -1,14 +1,21 @@
 #pragma once
+
 #include <string>
 #include <vector>
+
+
+
+
 namespace Landmark {
 
 	class Debugger;
 	class Logger {
+		
 		friend Debugger;
 		std::string Origin;
 		const std::string Reset = "\033[0m";
 	public:
+
 		Logger(std::string _Origin) {
 			Origin = _Origin;
 		}
@@ -39,15 +46,19 @@ namespace Landmark {
 		static std::string LogColorAnsiCodeBackground(LogColor color) {
 			return "\033[1;" + std::to_string(static_cast<int>(color) + 10) + "m";
 		}
-		std::string ComposeMessage(std::string Contents);
-		std::string ComposeMessageANSI(std::string Contents, LogColor TextColor, LogColor Background);
+		std::string Old_ComposeMessage(std::string Contents);
+		std::string Old_ComposeMessageANSI(std::string Contents, LogColor TextColor, LogColor Background);
 		void Log_List(std::string Title, const std::vector<std::string>& Content, LogColor TextColor = white, LogColor Background = black);
 		void Log(std::string log, LogColor TextColor = white, LogColor Background = black);
 
+	
 		void Debug(std::string log);
 		void Warning(std::string log);
 		void Error(std::string log);
 		void Critical(std::string log, bool ThrowException = false);
+
+
+	
 	};
 
 }

@@ -5,6 +5,7 @@
 
 #include "../VulkanEvents.h"
 #include "Device.h"
+#include "PhysicalDevice.h"
 
 namespace Landmark {
 	namespace Vk {
@@ -16,8 +17,8 @@ namespace Landmark {
 
 			using DeviceID = uint64_t;
 
-
-			static inline std::map<Device::DeviceID, Device> Devices;
+			static inline std::vector<PhysicalDevice> PhysicalDevices;
+			 
 			//std::vector<VkPhysicalDevice> PhysicalDevices;
 
 			static inline Logger LOGGER = Logger("DeviceManager");
@@ -27,13 +28,15 @@ namespace Landmark {
 
 
 			static void InitializeTasks();
-
+			static void InitDeviceQueues(const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Event_GpuTaskRequest::FullTaskRequest>>&);
 			static void EnumerateDevices();
 
+			
 		protected:
 			static void Init();
 		public:
-			static const std::map<Device::DeviceID, Device>& GetDevices() { return Devices; }
+			static const std::vector<PhysicalDevice>& GetDevices() { return PhysicalDevices; }
+			//static const std::map<Device::DeviceID, Device>& GetDevices() { return Devices; }
 		};
 
 

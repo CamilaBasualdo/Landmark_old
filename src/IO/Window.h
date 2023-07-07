@@ -15,6 +15,10 @@ namespace Landmark
 			friend WindowManager;
 			friend Vk::DeviceManager;
 			friend Vk::Device;
+
+			static inline Logger LOGGER = Logger("Window");
+
+
 			enum Type
 			{
 				
@@ -22,21 +26,22 @@ namespace Landmark
 
 			GLFWwindow* _Window;
 			const VkSurfaceKHR _Surface;
+			//VkPhysicalDevice _DeviceAssosiated;
 			
-			static inline Logger LOGGER = Logger("Window");
-
+			
+			
 		private:
 			Window();
 		protected:
-			VkSurfaceKHR GetSurface() { return _Surface; };
+			
 		public:
 			
-
+			VkSurfaceKHR GetSurface() { return _Surface; };
 			bool GetShouldClose();
 			void SetShouldClose(bool state);
 
 			void SwapBuffers();
-			static void PollEvents();
+			
 
 			void MakeCurrent(); 
 		};

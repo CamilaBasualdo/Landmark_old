@@ -3,10 +3,10 @@
 #include "Debug/LogSystem.h"
 namespace Landmark {
 
-	std::string Logger::ComposeMessage(std::string Contents) {
+	std::string Logger::Old_ComposeMessage(std::string Contents) {
 		return "[" + Origin + "] " + Contents + "\n";
 	}
-	std::string Logger::ComposeMessageANSI(std::string Contents, LogColor TextColor, LogColor Background) {
+	std::string Logger::Old_ComposeMessageANSI(std::string Contents, LogColor TextColor, LogColor Background) {
 		return "[" + Origin + "] " + LogColorAnsiCode(TextColor) + LogColorAnsiCodeBackground(Background)
 			+ Contents + Reset + "\n";
 	}
@@ -22,8 +22,8 @@ namespace Landmark {
 	void Logger::Log(std::string log, LogColor TextColor, LogColor Background)
 	{
 		
-		std::cout << ComposeMessageANSI(log, TextColor, Background);
-		LogSystem::Log(ComposeMessage(log));
+		std::cout << Old_ComposeMessageANSI(log, TextColor, Background);
+		LogSystem::Log(Old_ComposeMessage(log));
 	}
 
 	void Logger::Debug(std::string log)

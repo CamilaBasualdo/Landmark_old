@@ -5,7 +5,7 @@
 #include <vulkan/vulkan.hpp>
 #include "Task.h"
 #include "Devices/Device.h"
-
+#include "Devices/PhysicalDevice.h"
 namespace Landmark
 {
 	namespace Vk
@@ -24,24 +24,25 @@ namespace Landmark
 			struct TaskRequest {
 				const std::string Name = "Default Task Name";
 				const Task::TaskIntensities _type = Task::TaskIntensities::INVALID;
-				const int DeviceID = -1;
+				const PhysicalDevice::PhysicalDeviceID DeviceID = -1;
 				uint8_t RequestedCapabilities = 0b000000;
 				const char Extensions[VK_MAX_EXTENSION_NAME_SIZE][50] = { {0} };
 				const char Layers[VK_MAX_EXTENSION_NAME_SIZE][50] = { {0} };
 			};
-		private:
 			struct FullTaskRequest {
 				TaskRequest _ShallowRequest;
 				Task* _task;
 			};
-			std::map<int, std::vector<FullTaskRequest>> DeviceRequests;
+		private:
+			
+			std::map<PhysicalDevice::PhysicalDeviceID, std::vector<FullTaskRequest>> DeviceRequests;
 		public:
 		
-			const std::vector<Device> AvailableDevices;
+			const std::vector<PhysicalDevice>& AvailableDevices;
 			
 			
 			Task* DeclareTask(TaskRequest _request) {
-				Task* newtask = new Task(_request._type);
+				Task* newtask = new Task(_request.Name,_request._type);
 				
 
 				DeviceRequests[_request.DeviceID].push_back( FullTaskRequest{ _request,newtask });
@@ -49,7 +50,7 @@ namespace Landmark
 				return newtask;
 			}
 
-			const std::map<int, std::vector<FullTaskRequest>> GetRequests() { return DeviceRequests; }
+			const std::map<PhysicalDevice::PhysicalDeviceID, std::vector<FullTaskRequest>> GetRequests() { return DeviceRequests; }
 			
 			Event_GpuTaskRequest();
 		};

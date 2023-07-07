@@ -25,6 +25,7 @@ void Landmark::LogSystem::Log2File()
 	std::queue<std::string> Logs_Copy;
 
 	Logs.swap(Logs_Copy);
+
 	lock.unlock();
 
 	while (!Logs_Copy.empty())
@@ -60,6 +61,6 @@ void Landmark::LogSystem::Log(std::string _log)
 {
 	std::unique_lock<std::mutex> lock(LogFileMutex);
 	Logs.push(_log);
-
-
+	lock.unlock();
+	
 }

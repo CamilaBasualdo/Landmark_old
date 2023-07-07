@@ -24,6 +24,25 @@ Landmark::IO::Window::Window() : _Window([]()
 		return surface;
 
 }())
+/*, _DeviceAssosiated([this]()
+{
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(Vk::Vulkan::GetVkInstance() , & deviceCount, nullptr);
+
+		// Allocate memory for physical devices
+		std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
+		vkEnumeratePhysicalDevices(Vk::Vulkan::GetVkInstance(), &deviceCount, physicalDevices.data());
+
+		// Find the physical device that supports the surface
+		for (const auto& device : physicalDevices) {
+			VkBool32 surfaceSupported = VK_FALSE;
+			//vkGetPhysicalDeviceSurfaceSupportKHR(device, queueFamilyIndex, surface, &surfaceSupported);
+
+			if (surfaceSupported == VK_TRUE) {
+				return device;
+			}
+		}
+}())*/
 {
 	
 }
@@ -43,10 +62,7 @@ void Landmark::IO::Window::SwapBuffers()
 	glfwSwapBuffers(_Window);
 }
 
-void Landmark::IO::Window::PollEvents()
-{
-	glfwPollEvents();
-}
+
 
 void Landmark::IO::Window::MakeCurrent()
 {

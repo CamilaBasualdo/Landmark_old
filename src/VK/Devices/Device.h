@@ -3,9 +3,9 @@
 #include <string>
 #include <vulkan/vulkan.hpp>
 #include <vector>
-#include "Extension.h"
-#include "Layer.h"
+
 #include "../Task.h"
+#include "PhysicalDevice.h"
 namespace Landmark
 {
 	namespace Vk
@@ -30,30 +30,18 @@ namespace Landmark
 
 				static std::string DeviceTypes_toString(DeviceTypes _type);
 				
+				PhysicalDevice* _PhysicalDevice;
+					
+				
 
-
-				const VkPhysicalDevice PhysicalDevice;
-				const VkPhysicalDeviceProperties Properties;
-				const VkPhysicalDeviceFeatures Features;
-
-				const DeviceID ID;
-				const DeviceTypes DeviceType;
-				const std::string Name;
-
-				const std::vector<Extension> AvailableExtensions;
-				const std::vector<Layer> AvailableLayer;
-
-				const std::map<Task::CapabilitiesMask, int> QueueCapability;
 
 			private:
 				std::vector<Task*> Tasks;
 
-				const std::vector<Extension> GetExtensions();
-				const std::vector<Layer> GetLayers();
-				const std::map<Task::CapabilitiesMask, int> GetQueueCapacities();
+				
 
 			protected:
-				Device(VkPhysicalDevice _PhysicalDevice);
+				Device(PhysicalDevice* _PhysicalDevice);
 				
 			};
 

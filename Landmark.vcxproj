@@ -103,6 +103,8 @@
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Landmark.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\VK\Devices\PhysicalDevice.cpp" />
+    <ClCompile Include="src\VK\Devices\QueueFamily.cpp" />
     <ClCompile Include="src\VK\Vulkan.cpp" />
     <ClCompile Include="src\VK\VulkanEvents.cpp" />
     <ClCompile Include="src_demo\Demo.cpp" />
@@ -137,6 +139,8 @@
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\EventSystem.h" />
     <ClInclude Include="src\Module\Module.h" />
+    <ClInclude Include="src\VK\Devices\PhysicalDevice.h" />
+    <ClInclude Include="src\VK\Devices\QueueFamily.h" />
     <ClInclude Include="src\VK\VulkanEvents.h" />
     <ClInclude Include="src\IO\Window.h" />
     <ClInclude Include="src\Landmark.h" />

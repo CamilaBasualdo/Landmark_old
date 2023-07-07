@@ -124,7 +124,7 @@ namespace Landmark
 
 		void Vulkan::Update()
 		{
-			glfwPollEvents();
+			
 		}
 
 		void GLFW_ErrorCabllack(int errorcode, const char* desc)
@@ -176,7 +176,7 @@ namespace Landmark
 			for (int i = 0; i < glfwExtensionCount; i++)
 				RequestedExtensions.emplace_back(glfwExtensions[i]);
 
-
+			
 			RequestedExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 			RequestedExtensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 			createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
