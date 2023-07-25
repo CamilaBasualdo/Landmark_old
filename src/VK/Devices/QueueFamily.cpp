@@ -16,6 +16,7 @@ VkProperties([this]()
 		vkGetPhysicalDeviceQueueFamilyProperties(Owner->GetVkDevice(), &queueFamilyCount, queueFamilies.data());
 		return queueFamilies[ID];
 }()),
+
 	QueueCount(VkProperties.queueCount),
 	Capabilities([this]()
 	{

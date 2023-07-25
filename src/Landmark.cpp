@@ -9,6 +9,12 @@
 #include "Time/Time.h"
 #include "Audio/AudioSystem.h"
 #include <thread>
+
+#ifdef _WIN32
+#include <windows.h>
+#elif defined(__linux__) || defined(__APPLE__)
+#include <unistd.h>
+#endif
 namespace Landmark
 {
 	void Engine::DefaultModulesAttach()
@@ -32,6 +38,8 @@ namespace Landmark
 		std::cout << Logo32 << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
+
+		LOGGER.Log(ExePath);
 		if (InitializationParameters.IncludeDefaultModules) DefaultModulesAttach();
 
 		LOGGER.Debug("Engine Init");
@@ -103,9 +111,10 @@ namespace Landmark
 
 	void Engine::Init(EngineInitParameters p) 
 	{
+		
 		InitializationParameters = p;
 		InitializationProcess();
-
+		
 		UpdateProcess();
 
 		ShutdownProcess();
@@ -113,6 +122,22 @@ namespace Landmark
 		
 	}
 
+	std::string Engine::GetExePath()
+	{
+		std::string path;
+#ifdef _WIN32
+		char buffer[MAX_PATH];
+		GetModuleFileNameA(nullptr, buffer, MAX_PATH);
+		path = buffer;
+#elif defined(__linux__) || defined(__APPLE__)
+		char buffer[PATH_MAX];
+		ssize_t count = readlink("/proc/self/exe", buffer, PATH_MAX);
+		if (count != -1) {
+			path = buffer;
+		}
+#endif
+		return path;
+	}
 
 
 	void Engine::Shutdown()

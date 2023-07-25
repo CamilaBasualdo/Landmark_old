@@ -28,6 +28,7 @@ namespace Landmark::Vk
 		const  PhysicalDevice* Owner;
 		const int ID;
 		const VkQueueFamilyProperties VkProperties;
+
 		const int QueueCount;
 		const QueueFamilyCapabilitiesMask Capabilities;
 

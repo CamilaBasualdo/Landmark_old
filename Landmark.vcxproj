@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\VK\Devices\Queue.cpp" />
     <ClCompile Include="src\Audio\AudioListener.cpp" />
     <ClCompile Include="src\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Audio\AudioDevice.cpp" />
@@ -109,7 +110,6 @@
     <ClCompile Include="src\VK\VulkanEvents.cpp" />
     <ClCompile Include="src_demo\Demo.cpp" />
     <ClCompile Include="src\VK\Task.cpp" />
-    <ClCompile Include="src\VK\TaskRequester.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\GLFW\include\GLFW\glfw3.h" />
@@ -120,6 +120,7 @@
     <ClInclude Include="include\OpenAL\include\EFX-Util.h" />
     <ClInclude Include="include\OpenAL\include\efx.h" />
     <ClInclude Include="include\OpenAL\include\xram.h" />
+    <ClInclude Include="src\VK\Devices\Queue.h" />
     <ClInclude Include="src\Audio\AudioListener.h" />
     <ClInclude Include="src\Audio\AudioSystem.h" />
     <ClInclude Include="src\Audio\AudioDevice.h" />
@@ -147,7 +148,6 @@
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\VK\Vulkan.h" />
     <ClInclude Include="src\VK\Task.h" />
-    <ClInclude Include="src\VK\TaskRequester.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="include\GLFW\lib\glfw3.lib" />

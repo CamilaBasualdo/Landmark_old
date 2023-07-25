@@ -11,14 +11,10 @@ namespace Landmark::IO
 }
 namespace Landmark::Render
 {
-
-	class Renderer :Module, Events::EventSubscriber
+	class Event_RendererInit : Events::Event {
+	};
+	class Renderer :Module, Events::EventSubscriber,Events::EventDispatcher
 	{
-
-
-
-
-
 
 		static inline Logger LOGGER = Logger("Renderer");
 
@@ -27,6 +23,8 @@ namespace Landmark::Render
 		static inline std::thread RenderingThread;
 
 		static inline bool CloseThread = false;
+
+		static inline VkRenderPass RenderPass;
 	public:
 
 		Renderer();
@@ -42,6 +40,7 @@ namespace Landmark::Render
 
 	private:
 		static void RenderingThreadStart();
+		void InitRenderPass();
 
 	public:
 		void Exit() override;

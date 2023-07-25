@@ -2,13 +2,14 @@
 #include <vulkan/vulkan.hpp>
 #include <string>
 #include "Devices/QueueFamily.h"
+
 namespace Landmark {
 	namespace Vk {
 
-
+		class Queue;
 		class Task
 		{
-
+			friend Queue;
 		public:
 			const std::string Name;
 			enum TaskIntensities {
@@ -16,7 +17,7 @@ namespace Landmark {
 				VERY_HIGH = 100, //exclusive Queue
 				HIGH = 70, //Queue with >lows
 				MEDIUM = 30, //mix with >mediums
-				LOW = 10,
+				LOW = 10, //self explanatory
 				
 
 
@@ -26,14 +27,18 @@ namespace Landmark {
 
 
 		private:
+			Queue* Owner;
 			//TaskInfo _taskinfo;
 			bool Initialized = false;
+			VkCommandBuffer CmdBuffer;
 
 			QueueFamily::QueueFamilyCapabilitiesMask Capabilities = 0;
 
+			static inline Logger LOGGER = Logger("Task");
+
 		protected:
 
-			void Initiaize();
+			void Initiaize(Queue*);
 		public:
 			Task(std::string _Name,TaskIntensities _type);
 			bool IsInitialized() { return Initialized; }

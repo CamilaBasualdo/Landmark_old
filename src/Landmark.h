@@ -27,6 +27,7 @@ namespace Landmark
 		static void InitializationProcess();
 		static void UpdateProcess();
 		static void ShutdownProcess();
+		static std::string GetExePath();
 		static inline EngineInitParameters InitializationParameters;
 #pragma region ASCIIlogos
 		static inline const char* Logo32 = R"V0G0N(                    
@@ -75,9 +76,10 @@ namespace Landmark
 			_EngineModules[&typeid(T)] = reinterpret_cast<Module*>(new T(std::forward<Args>(args)...));
 			LOGGER.Log("Registered Module (" + std::string(typeid(T).name()).substr(6) + ") ");
 		}
-		static void Init(EngineInitParameters p);
 
-		;
+		static void Init(EngineInitParameters p);
+		const static inline std::string ExePath = GetExePath();
+		
 
 
 		static void PrintLogo();

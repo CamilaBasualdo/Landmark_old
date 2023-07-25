@@ -18,17 +18,19 @@ namespace Landmark {
 			using DeviceID = uint64_t;
 
 			static inline std::vector<PhysicalDevice> PhysicalDevices;
-			 
-			//std::vector<VkPhysicalDevice> PhysicalDevices;
+			static inline std::vector<Device> LogicalDevices;
 
+			static inline Device* MainPresentingDevice;
+			//std::vector<VkPhysicalDevice> PhysicalDevices;
+			 
 			static inline Logger LOGGER = Logger("DeviceManager");
 
 			void LogGpusInfo();
 
 
 
-			static void InitializeTasks();
-			static void InitDeviceQueues(const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Event_GpuTaskRequest::FullTaskRequest>>&);
+			static void InitializeDevices();
+			static void InitDevice(const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Event_GpuTaskRequest::FullTaskRequest>>&);
 			static void EnumerateDevices();
 
 			
@@ -36,6 +38,7 @@ namespace Landmark {
 			static void Init();
 		public:
 			static const std::vector<PhysicalDevice>& GetDevices() { return PhysicalDevices; }
+			static Device* GetMainPresentingDevice() { return MainPresentingDevice; }
 			//static const std::map<Device::DeviceID, Device>& GetDevices() { return Devices; }
 		};
 

@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../Logger.h"
+#include "../VK/Devices/DeviceManager.h"
 class GLFWwindow;
 namespace Landmark
 {
@@ -26,14 +27,25 @@ namespace Landmark
 
 			GLFWwindow* _Window;
 			const VkSurfaceKHR _Surface;
+
+			
+
+			VkSwapchainKHR swapChain;
+			std::vector<VkImage> Images;
+			std::vector<VkImageView> ImageViews;
+			std::vector<VkFramebuffer> Framebuffers;
+
+			bool Initialized = false;
 			//VkPhysicalDevice _DeviceAssosiated;
 			
 			
 			
 		private:
 			Window();
+		
 		protected:
-			
+			void Init();
+
 		public:
 			
 			VkSurfaceKHR GetSurface() { return _Surface; };
@@ -43,7 +55,9 @@ namespace Landmark
 			void SwapBuffers();
 			
 
-			void MakeCurrent(); 
+			void MakeCurrent();
+
+			
 		};
 		
 	}

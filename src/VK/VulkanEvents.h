@@ -10,13 +10,14 @@ namespace Landmark
 {
 	namespace Vk
 	{
-		class Event_VulkanInstancePreInit : Events::Event {
-		public:
+		class Event_VulkanInstancePreInit : Events::Event {};
+		class Event_VulkanInstanceInit : Events::Event {};
 
+		class Event_VulkanDeviceInit : Events::Event
+		{
+			
 		};
-
-
-
+		
 
 		
 		class Event_GpuTaskRequest : Events::Event {
@@ -26,8 +27,9 @@ namespace Landmark
 				const Task::TaskIntensities _type = Task::TaskIntensities::INVALID;
 				const PhysicalDevice::PhysicalDeviceID DeviceID = -1;
 				uint8_t RequestedCapabilities = 0b000000;
-				const char Extensions[VK_MAX_EXTENSION_NAME_SIZE][50] = { {0} };
-				const char Layers[VK_MAX_EXTENSION_NAME_SIZE][50] = { {0} };
+				std::vector<std::string> Extensions;
+				std::vector<std::string> Layers;
+				
 			};
 			struct FullTaskRequest {
 				TaskRequest _ShallowRequest;

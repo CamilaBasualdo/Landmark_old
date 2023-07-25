@@ -4,6 +4,7 @@
 #include "Devices/DeviceManager.h"
 #include <sstream>
 #include <vulkan/vk_enum_string_helper.h>
+#include "../IO/WindowManager.h"
 namespace Landmark
 {
 	namespace Vk
@@ -22,10 +23,11 @@ namespace Landmark
 		std::string VulkanValidationLogFormat(const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData) {
 			//static Debug::Logger _logger = Debug::Debugger::GetLogger("Vulkan Validation");
 
-			std::string ValidationLog = "\n=== " + std::string(pCallbackData->pMessageIdName) +" ===\n";
+			std::string ValidationLog = "";
+				ValidationLog +"\n"+ std::string(pCallbackData->pMessageIdName) + "\n";
 			ValidationLog += std::to_string(pCallbackData->objectCount) +" Object(s) \n";
 			for (int i = 0; i < pCallbackData->objectCount; i++) {
-				ValidationLog += " " + std::to_string(i) + "| ";
+				ValidationLog += "" + std::to_string(i) + "| ";
 				ValidationLog += (pCallbackData->pObjects[i].pObjectName) ? pCallbackData->pObjects[i].pObjectName : "No Name" + std::string(" | ");
 				
 				ValidationLog += std::string(string_VkObjectType(pCallbackData->pObjects[i].objectType)) + " | ";
@@ -47,8 +49,8 @@ namespace Landmark
 
 			}
 			ValidationLog += std::to_string(pCallbackData->cmdBufLabelCount) + " CmdBuffer(s) \n";
-			if (pCallbackData->cmdBufLabelCount == 0) ValidationLog += "None\n";
-			else ValidationLog += "\n";
+			
+			
 			for (int i = 0; i < pCallbackData->cmdBufLabelCount; i++) {
 				ValidationLog += " " + std::to_string(i) + "| ";
 				ValidationLog += ((pCallbackData->pCmdBufLabels->pLabelName) ? pCallbackData->pCmdBufLabels->pLabelName : "No Name") + std::string("\n");
@@ -59,7 +61,6 @@ namespace Landmark
 			}
 			ValidationLog += std::string("Log:\n") + pCallbackData->pMessage + std::string("\n");
 
-			ValidationLog += "========================================================\n";
 			return ValidationLog;
 			//_logger.Log(ValidationLog);
 
@@ -67,23 +68,40 @@ namespace Landmark
 		}
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL VulkankValidationCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,VkDebugUtilsMessageTypeFlagsEXT messageType,const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,void* pUserData) {
-			static Logger _logger = Logger("Vulkan Validation");
+			static Logger _logger = Logger("Vulkan");
+			static Logger _LOGGERS[] = { Logger("Vulkan-General"), Logger("Vulkan-Validation"),Logger("Vulkan-Performance"),Logger("Vulkan-Unknown")};
+
+
+
+
+				uint64_t typeIndex = 0;
+			for (int i = 0; i < sizeof(VkDebugUtilsMessageTypeFlagsEXT); i++)
+			{
+				auto tester = (messageType >> i);
+				if (tester & 0b1)
+				{
+					typeIndex = i;
+					break;
+				}
+			}
+				
+					
 
 			auto ss = VulkanValidationLogFormat(pCallbackData);
 			
 			
 			switch (messageSeverity) {
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-				_logger.Log(ss);
+				_LOGGERS[typeIndex].Log(ss);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-				_logger.Log(ss);
+				_LOGGERS[typeIndex].Log(ss);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-				_logger.Warning(ss);
+				_LOGGERS[typeIndex].Warning(ss);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-				_logger.Error(ss);
+				_LOGGERS[typeIndex].Error(ss);
 				break;
 
 			}
@@ -104,22 +122,27 @@ namespace Landmark
 
 		void Vulkan::PreInit()
 		{
-			InstanceInit();
-
+			SubscribeTo<IO::Event_MainSurfaceInit>([&](IO::Event_MainSurfaceInit& e){
+				LOGGER.Log("Main Surface Created. Initializing Devices");
+			DeviceManager::Init(); });
 			
+
+
 		}
 
 		void Vulkan::Init()
 		{
 			
 			
+			InstanceInit();
 
+			Dispatch<Event_VulkanInstanceInit>();
 		
 		}
 
 		void Vulkan::PostInit()
 		{
-			DeviceManager::Init();
+			
 		}
 
 		void Vulkan::Update()

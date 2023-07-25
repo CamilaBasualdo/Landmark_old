@@ -19,7 +19,7 @@ namespace Landmark {
 		Logger(std::string _Origin) {
 			Origin = _Origin;
 		}
-
+		Logger(const Logger& other) = default;
 
 		enum LogColor {
 			black = 30,

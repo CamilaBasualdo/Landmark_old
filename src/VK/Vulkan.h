@@ -14,7 +14,7 @@ namespace Landmark
 		 class DeviceManager;
 		
 
-		class Vulkan :Module, Events::EventDispatcher {
+		class Vulkan :Module, Events::EventDispatcher, Events::EventSubscriber {
 			friend Engine;
 
 			friend DeviceManager;

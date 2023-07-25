@@ -37,7 +37,7 @@ namespace Landmark
 				PhysicalDevice device = PhysicalDevices[i];
 				_DeviceNames.push_back(
 					DeviceTypes_toString(device._DeviceType) + " [" + std::to_string(device.DeviceID) + "] : " + device.
-					Name + " | Present: " + std::to_string(device.PresentCapable));
+					Name + " | Present: " + (device.PresentCapable ? "Yes" : "No"));
 			}
 			LOGGER.Log_List("Vulkan Devices Available:", _DeviceNames, Logger::yellow);
 		}
@@ -45,14 +45,15 @@ namespace Landmark
 
 		void DeviceManager::Init()
 		{
+			
 			LOGGER.Log("Init");
 			EnumerateDevices();
 
-			InitializeTasks();
+			InitializeDevices();
 		}
 
 
-		void DeviceManager::InitializeTasks()
+		void DeviceManager::InitializeDevices()
 		{
 			Event_GpuTaskRequest e = Dispatch<Event_GpuTaskRequest>();
 			auto Requests = e.GetRequests();
@@ -62,11 +63,13 @@ namespace Landmark
 			{
 				
 
-				InitDeviceQueues(request);
+				InitDevice(request);
 			}
+
+			Dispatch<Event_VulkanDeviceInit>();
 		}
 
-		void DeviceManager::InitDeviceQueues(
+		void DeviceManager::InitDevice(
 			const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Event_GpuTaskRequest::FullTaskRequest>>& Requests)
 		{
 			
@@ -113,11 +116,20 @@ namespace Landmark
 					a) queue 1 mask AND queue 2 mask == 0
 					b) Queue 1 usage + queue 2 usage <= 100%
 			 */
-			
-			for (auto request: Requests.second)
+
+			std::vector<const char* > RequestedExtensions = {};
+			std::vector<const char*> RequestedLayers = { "VK_LAYER_KHRONOS_validation" };
+
+
+
+			for (auto& request: Requests.second)
 			{
 				LOGGER.Log("Checking Request " + request._ShallowRequest.Name);
 				auto RequestedCapabilities = request._ShallowRequest.RequestedCapabilities;
+				for (auto& ext : request._ShallowRequest.Extensions)
+					RequestedExtensions.push_back(ext.data());
+				for (auto& lay : request._ShallowRequest.Layers)
+					RequestedLayers.push_back(lay.data());
 				int i = 0;
 				for (auto& queueFamily : QueueFamilies)
 				{
@@ -146,12 +158,15 @@ namespace Landmark
 						//does not fit in any existing reservation
 
 						//if queue family is at capacity skip to next family
-						if (queueFamily.Usage.size() == queueFamily.TotalQueueCount) continue;
+						if (queueFamily.Usage.size() == queueFamily.TotalQueueCount) {
+							LOGGER.Log("No more queues available in this family");
+							continue;
 
+						}
 
 						//otherwise create new reservation
 						queueFamily.Usage.push_back({ { request._task }, request._ShallowRequest._type });
-						LOGGER.Log("Created new Reservation ");
+						LOGGER.Log("Created new Reservation. Queues Remaining: " + std::to_string(queueFamily.TotalQueueCount- queueFamily.Usage.size()));
 						break;
 
 					}
@@ -163,14 +178,19 @@ namespace Landmark
 			LOGGER.Log("Finished Allocating Tasks");
 
 			std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
+			std::vector<std::vector<float>> Queue_Priorities = {};
 			for (int i = 0 ; i <QueueFamilies.size() ;i++)
 			{
-				LOGGER.Log("QueueFamily " + std::to_string(i));
+				LOGGER.Log("=== QueueFamily " + std::to_string(i) + " ===");
 				auto& queueFamily = QueueFamilies[i];
+
+
+				if (queueFamily.Usage.empty()) continue;
+				
 				for (int q = 0;q < queueFamily.Usage.size();q++)
 				{
 					auto& queue = queueFamily.Usage[q];
-					std::string Log = "	Queue " + std::to_string(q) + " Task Count: " + std::to_string(queue.Tasks.size()) + " Usage:" + std::to_string(queue.TotalUse) + "%";
+					std::string Log = "Queue " + std::to_string(q) + " Task Count: " + std::to_string(queue.Tasks.size()) + " Usage: " + std::to_string(queue.TotalUse) + "%";
 					LOGGER.Log(Log);
 					for (auto& task : queue.Tasks)
 						LOGGER.Log(" | " + task->Name + " : " + std::to_string(task->taskType) + "%");
@@ -178,13 +198,22 @@ namespace Landmark
 
 
 				}
+				
 				VkDeviceQueueCreateInfo createInfo;
+				
 				createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 				createInfo.queueFamilyIndex = i;
 				createInfo.queueCount = queueFamily.Usage.size();
-				float queuePriority = 1.0f;
-				createInfo.pQueuePriorities = &queuePriority;
 				
+				//std::vector<float> prior(createInfo.queueCount, 1.0f);
+				//Queue_Priorities.push_back(prior);
+				Queue_Priorities.emplace_back(createInfo.queueCount, 1.0f);
+
+				createInfo.pQueuePriorities = Queue_Priorities[i].data();
+				createInfo.flags = 0b0;
+				createInfo.pNext = nullptr; //MAKE SURE TO CHANGE, WILL BREAK IF NOT
+				//will it tho? i dont think you have to chain queue infos like this.
+				//you do it in the array
 				
 
 				queue_create_infos.push_back(createInfo);
@@ -192,11 +221,44 @@ namespace Landmark
 
 			VkDeviceCreateInfo createInfo{};
 			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
+			
 			createInfo.pQueueCreateInfos = queue_create_infos.data();
 			createInfo.queueCreateInfoCount = queue_create_infos.size();
+
+
+			createInfo.enabledLayerCount = RequestedLayers.size();
+			createInfo.ppEnabledLayerNames = RequestedLayers.data();
+
+			createInfo.enabledExtensionCount = RequestedExtensions.size();
+			createInfo.ppEnabledExtensionNames = RequestedExtensions.data();
+
 			VkPhysicalDeviceFeatures deviceFeatures{};
 			createInfo.pEnabledFeatures = &deviceFeatures;
+
+			Device::DeviceCreateInfo FullCreateInfo = { createInfo };
+
+			for (int i = 0 ; i < QueueFamilies.size();i++)
+			{
+				auto& Family = QueueFamilies[i];
+				int p = 0;
+				for (auto& TaskCollection : Family.Usage)
+				{
+					
+					Device::DeviceCreateInfo::QueueIdentifier qId = { i, p };
+					
+					FullCreateInfo.Tasks.insert(std::make_pair( qId,TaskCollection.Tasks));
+						p++;
+				}
+				
+			}
+
+			//Device Creation
+			LogicalDevices.emplace_back(&Device, FullCreateInfo);
+			if (LogicalDevices.back()._PhysicalDevice->PresentCapable)
+				MainPresentingDevice = &LogicalDevices.back();
+
+
+			
 
 		}
 	}

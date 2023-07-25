@@ -1,5 +1,7 @@
 ﻿#include "AudioSystem.h"
 
+#include "efx.h"
+
 
 void Landmark::Audio::AudioSystem::ListDevices()
 {
@@ -60,13 +62,9 @@ void Landmark::Audio::AudioSystem::Init()
 		LOGGER.Log("Support for 5.1 channels");
 	}
 
-	auto Vendor = alGetString(AL_VENDOR);
-	auto Renderer = alGetString(AL_RENDERER);
-	if (Vendor)
-		LOGGER.Log(std::string(Vendor));
-	if (Renderer)
-		LOGGER.Log(std::string(Renderer));
 	ListDevices();
+
+	
 }
 
 void Landmark::Audio::AudioSystem::Exit()

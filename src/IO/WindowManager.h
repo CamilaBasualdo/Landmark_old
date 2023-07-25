@@ -13,7 +13,9 @@ namespace Landmark
 
 namespace Landmark::IO
 {
-	class WindowManager : Module, Events::EventSubscriber
+	class Event_MainSurfaceInit : Events::Event {};
+	class Event_WindowFormatsSelected: Events::Event {};
+	class WindowManager : Module, Events::EventSubscriber, Events::EventDispatcher
 	{
 
 		static inline Vk::Task* PresentTask = nullptr;
@@ -21,7 +23,29 @@ namespace Landmark::IO
 
 		static inline Logger LOGGER = Logger("WindowManager");
 
+
+	
+		void SelectFormats();
+		inline static VkSurfaceFormatKHR SelectedSurfaceFormat;
+		inline static VkPresentModeKHR SelectedPresentMode;
+		inline static uint32_t SelectedImageCount;
+		inline static VkExtent2D SelectedExtent;
 	public:
+		static VkSurfaceFormatKHR GetSurfaceFormat()  { return SelectedSurfaceFormat; }
+		static VkPresentModeKHR GetPresentMode()  { return SelectedPresentMode; }
+		static uint32_t GetImageCount()  { return SelectedImageCount; }
+		static VkExtent2D GetExtent()  { return SelectedExtent; }
+
+		const static inline std::vector<VkSurfaceFormatKHR> PreferredFormats = {
+			{VK_FORMAT_B8G8R8A8_SRGB ,VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}
+		};
+
+		const static inline std::vector<VkPresentModeKHR> PreferredPresentingModes = {
+			VK_PRESENT_MODE_MAILBOX_KHR,
+			VK_PRESENT_MODE_IMMEDIATE_KHR,
+			VK_PRESENT_MODE_FIFO_RELAXED_KHR,
+			VK_PRESENT_MODE_FIFO_KHR
+		};
 		WindowManager();
 		std::string GetName() const override { return "WindowManager"; }
 		void PreInit() override;

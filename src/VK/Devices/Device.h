@@ -3,7 +3,7 @@
 #include <string>
 #include <vulkan/vulkan.hpp>
 #include <vector>
-
+#include "Queue.h"
 #include "../Task.h"
 #include "PhysicalDevice.h"
 namespace Landmark
@@ -13,9 +13,12 @@ namespace Landmark
 		
 		
 			class DeviceManager;
+			class Queue;
 			class Device
 			{
 				friend DeviceManager;
+				friend Queue;
+				friend Task;
 				
 			public:
 				using DeviceID = uint64_t;
@@ -28,20 +31,35 @@ namespace Landmark
 					OTHER = VK_PHYSICAL_DEVICE_TYPE_OTHER
 				};
 
+				
 				static std::string DeviceTypes_toString(DeviceTypes _type);
-				
-				PhysicalDevice* _PhysicalDevice;
-					
-				
-
 
 			private:
+				static inline Logger LOGGER = Logger("Vk::Device");
+				PhysicalDevice* _PhysicalDevice;
+				VkDevice _LogicalDevice;
+
+				//sorted by [family][index]
+				using _QueueFamiliy = std::vector<Queue>;
+				std::vector<_QueueFamiliy> ActiveQueuesFamilies;
+
 				std::vector<Task*> Tasks;
 
+			protected:
 				
 
-			protected:
-				Device(PhysicalDevice* _PhysicalDevice);
+			public:
+				const PhysicalDevice& GetPhysicalDevice() { return *_PhysicalDevice; }
+				VkDevice& GetVkDevice() { return _LogicalDevice; }
+				VkQueue& GetQueue(int QueueFamily, int QueueIndex);
+				struct DeviceCreateInfo
+				{
+					VkDeviceCreateInfo createinfo;
+					using QueueIdentifier = std::pair<uint32_t, uint32_t>;
+					std::map<QueueIdentifier, std::vector<Task*>> Tasks;
+
+				};
+				Device(PhysicalDevice* _PhysicalDevice, DeviceCreateInfo createInfo);
 				
 			};
 

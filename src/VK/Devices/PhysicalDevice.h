@@ -26,6 +26,7 @@ namespace Landmark
 		class PhysicalDevice
 		{
 			friend DeviceManager;
+			friend Device;
 			friend QueueFamily;
 		public:using PhysicalDeviceID = uint32_t;
 
@@ -36,7 +37,10 @@ namespace Landmark
 			const VkPhysicalDevice _PhysicalDevice;
 
 			const VkPhysicalDeviceProperties VkProperties;
+
+			const VkPhysicalDeviceRayTracingPipelinePropertiesKHR VkRayTracingProperties;
 			const VkPhysicalDeviceFeatures VkFeatures;
+
 
 		public:
 			
@@ -49,7 +53,15 @@ namespace Landmark
 			const std::vector<Layer> AvailableLayers;
 			const std::vector<QueueFamily> QueueFamilies;
 
+			struct PresentCapabilities_T
+			{
+				VkSurfaceCapabilitiesKHR capabilities;
+				std::vector<VkSurfaceFormatKHR> formats;
+				std::vector<VkPresentModeKHR> presentModes;
+			};
+
 			const bool PresentCapable;
+			const PresentCapabilities_T* presentCapabilities = nullptr;
 
 		protected:
 			VkPhysicalDevice GetVkDevice()const { return _PhysicalDevice; }

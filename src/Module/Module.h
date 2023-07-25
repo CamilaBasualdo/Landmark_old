@@ -4,10 +4,7 @@
 namespace Landmark {
 	class Module {
 
-
 	public:
-
-
 
 		Module() {
 
