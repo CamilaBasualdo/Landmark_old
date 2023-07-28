@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../Containers/lobby.h"
-#include "../Logger.h"
+#include "../../Containers/lobby.h"
+#include "../../Logger.h"
 #include <typeinfo>
 #include <string>
+
 namespace Landmark {
 	namespace ECS {
-
+		class Entity;
 		class ComponentBase {
 
 			

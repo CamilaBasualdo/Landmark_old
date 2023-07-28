@@ -5,7 +5,7 @@
 #include "../Threads/ThreadManager.h"
 #include "../Landmark.h"
 #include "../IO/WindowManager.h"
-
+#include "../VK/Devices/DeviceManager.h"
 #include <sstream>
 namespace Landmark
 {
@@ -99,8 +99,10 @@ namespace Landmark
 			colorAttachmentRef.attachment = 0;
 			colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+			//std::vector<VkSubpassDescription> SubPasses;
 			VkSubpassDescription subpass{};
 			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+			
 			
 			subpass.colorAttachmentCount = 1;
 			subpass.pColorAttachments = &colorAttachmentRef;
@@ -133,6 +135,9 @@ namespace Landmark
 			{
 				if (IO::WindowManager::MainWindow().GetShouldClose())
 					Engine::Shutdown();
+
+
+				IO::WindowManager::MainWindow().PushNextFrame();
 			}
 		}
 

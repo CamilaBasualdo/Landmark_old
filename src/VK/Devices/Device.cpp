@@ -37,17 +37,18 @@ namespace Landmark
 			}
 			//LOGGER.Log("Vulkan Device (" + _PhysicalDevice->Name + ") Initialized");
 
-			ActiveQueuesFamilies.resize(createInfo.createinfo.queueCreateInfoCount);
+			//ActiveQueuesFamilies.resize(createInfo.createinfo.queueCreateInfoCount);
 
 			for (int i = 0 ; i < createInfo.createinfo.queueCreateInfoCount;i++)
 			{
 				auto queueInfo = createInfo.createinfo.pQueueCreateInfos[i];
 				int queueFamilyId = queueInfo.queueFamilyIndex;
-				ActiveQueuesFamilies[queueFamilyId].reserve(queueInfo.queueCount);
+				//ActiveQueuesFamilies[queueFamilyId].reserve(queueInfo.queueCount);
 				for (int p = 0;p<queueInfo.queueCount;p++)
 				{
-
-					ActiveQueuesFamilies[queueFamilyId].push_back(Queue(this, queueFamilyId, p,createInfo.Tasks[std::make_pair(queueFamilyId,p)]));
+					
+					//ActiveQueuesFamilies[queueFamilyId].push_back(Queue(this, queueFamilyId, p,createInfo.Tasks[std::make_pair(queueFamilyId,p)]));
+					ActiveQueuesFamilies[queueFamilyId].emplace_back(this, queueFamilyId, p, createInfo.Tasks[std::make_pair(queueFamilyId, p)]);
 					//vkGetDeviceQueue(_LogicalDevice, i, p, &Queues[i][p]);
 				}
 			}

@@ -26,6 +26,10 @@ namespace Landmark::Vk
 		Queue(const Queue&) = default;
 
 		Queue& operator=(const Queue&) = default;
+
+		const int GetFamilyID() const { return FamilyID; }
+		const int GetQueueID() const { return QueueID; }
+		VkQueue GetQueue() const { return _Queue; }
 	};
 
 

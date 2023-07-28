@@ -27,7 +27,7 @@ namespace Landmark {
 
 
 		private:
-			Queue* Owner;
+			Queue* Owner = nullptr;
 			//TaskInfo _taskinfo;
 			bool Initialized = false;
 			VkCommandBuffer CmdBuffer;
@@ -50,6 +50,7 @@ namespace Landmark {
 
 			void Upload();
 
+			Queue* GetOwner() const { return Owner; }
 		};
 	}
 }

@@ -38,6 +38,9 @@ namespace Landmark::Render
 
 		virtual void PostInit() override;
 
+
+		static VkRenderPass GetRenderPass() { return RenderPass; }
+
 	private:
 		static void RenderingThreadStart();
 		void InitRenderPass();

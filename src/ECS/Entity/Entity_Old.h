@@ -1,12 +1,15 @@
 #pragma once
-#include "../Component/Component.h"
+
+#include "../../Containers/lobby.h"
+#include <string>
 #include <map>
 #include <typeinfo>
 namespace Landmark {
 	namespace ECS {
+		class ComponentBase;
 		class Entity {
-
-
+			
+			//holds [TypeID(T).name, Component]
 			std::map<std::string, lobby<ComponentBase>::address> Components = {};
 
 

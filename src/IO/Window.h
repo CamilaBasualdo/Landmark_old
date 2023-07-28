@@ -4,6 +4,7 @@
 
 #include "../Logger.h"
 #include "../VK/Devices/DeviceManager.h"
+#include <General_Utils.h>
 class GLFWwindow;
 namespace Landmark
 {
@@ -24,16 +25,16 @@ namespace Landmark
 			{
 				
 			};
+			uvec2 WindowSize = { 800,600 };
 
 			GLFWwindow* _Window;
 			const VkSurfaceKHR _Surface;
-
-			
-
 			VkSwapchainKHR swapChain;
 			std::vector<VkImage> Images;
 			std::vector<VkImageView> ImageViews;
 			std::vector<VkFramebuffer> Framebuffers;
+
+			VkFence PresentingFence;
 
 			bool Initialized = false;
 			//VkPhysicalDevice _DeviceAssosiated;
@@ -52,10 +53,12 @@ namespace Landmark
 			bool GetShouldClose();
 			void SetShouldClose(bool state);
 
-			void SwapBuffers();
+			void PushNextFrame();
 			
 
 			void MakeCurrent();
+
+			uvec2 GetWindowSize() const { return WindowSize; }
 
 			
 		};

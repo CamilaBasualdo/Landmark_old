@@ -15,10 +15,12 @@ namespace Landmark::IO
 {
 	class Event_MainSurfaceInit : Events::Event {};
 	class Event_WindowFormatsSelected: Events::Event {};
+
+
 	class WindowManager : Module, Events::EventSubscriber, Events::EventDispatcher
 	{
-
-		static inline Vk::Task* PresentTask = nullptr;
+		friend Window;
+		
 		static inline Window* _MainWindow = nullptr;
 
 		static inline Logger LOGGER = Logger("WindowManager");
@@ -30,6 +32,9 @@ namespace Landmark::IO
 		inline static VkPresentModeKHR SelectedPresentMode;
 		inline static uint32_t SelectedImageCount;
 		inline static VkExtent2D SelectedExtent;
+
+	protected:
+		static inline Vk::Task* PresentTask = nullptr;
 	public:
 		static VkSurfaceFormatKHR GetSurfaceFormat()  { return SelectedSurfaceFormat; }
 		static VkPresentModeKHR GetPresentMode()  { return SelectedPresentMode; }

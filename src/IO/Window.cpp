@@ -4,11 +4,11 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vk_enum_string_helper.h>
 #include "WindowManager.h"
-
-Landmark::IO::Window::Window() : _Window([]()
+#include "../Renderer/Renderer.h"
+Landmark::IO::Window::Window() : _Window([&]()
 	{
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		auto Window = glfwCreateWindow(800, 600, "Default Window Title", NULL, NULL);
+		auto Window = glfwCreateWindow(WindowSize.x, WindowSize.y, "Default Window Title", NULL, NULL);
 		if (!Window)
 			LOGGER.Error("Failed to create GLFW Window");
 		else
@@ -51,13 +51,13 @@ Landmark::IO::Window::Window() : _Window([]()
 		Init();
 }
 
-		
+
 
 		void Landmark::IO::Window::Init()
 		{
 			if (Initialized) return;
 
-			
+
 			auto PresentingDevice = Vk::DeviceManager::GetMainPresentingDevice();
 
 			VkSwapchainCreateInfoKHR createInfo{};
@@ -70,6 +70,7 @@ Landmark::IO::Window::Window() : _Window([]()
 			createInfo.imageExtent = WindowManager::GetExtent();
 			createInfo.imageArrayLayers = 1;
 			createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	
 
 			/*
 			VK_SHARING_MODE_EXCLUSIVE: An image is owned by one queue family at a time and ownership must be explicitly transferred before using it in another queue family. This option offers the best performance.
@@ -91,7 +92,7 @@ Landmark::IO::Window::Window() : _Window([]()
 			}
 
 			LOGGER.Log("Window Swapchain Created. " + std::to_string(WindowManager::GetImageCount()) + " Images. Format:" + string_VkFormat(WindowManager::GetSurfaceFormat().format) +
-			" Color Space:" + string_VkColorSpaceKHR(WindowManager::GetSurfaceFormat().colorSpace)+" Present Mode:" + string_VkPresentModeKHR(WindowManager::GetPresentMode()));
+				" Color Space:" + string_VkColorSpaceKHR(WindowManager::GetSurfaceFormat().colorSpace) + " Present Mode:" + string_VkPresentModeKHR(WindowManager::GetPresentMode()));
 
 			uint32_t imagecount;
 			vkGetSwapchainImagesKHR(PresentingDevice->GetVkDevice(), swapChain, &imagecount, nullptr);
@@ -116,13 +117,36 @@ Landmark::IO::Window::Window() : _Window([]()
 				if (vkCreateImageView(PresentingDevice->GetVkDevice(), &createInfo, nullptr, &ImageViews[i]) != VK_SUCCESS) {
 					LOGGER.Critical("Failed to create Image View", true);
 				}
-				
+
 			}
 			LOGGER.Log("Image Views Created");
 
 			Framebuffers.resize(Images.size());
-		
-				
+			for (int i = 0; i < ImageViews.size(); i++)
+			{
+				VkImageView attachments[] = {
+					 ImageViews[i]
+				};
+
+				VkFramebufferCreateInfo framebufferInfo{};
+				framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+				framebufferInfo.renderPass = Render::Renderer::GetRenderPass();
+				framebufferInfo.attachmentCount = 1;
+				framebufferInfo.pAttachments = attachments;
+				framebufferInfo.width = WindowManager::GetExtent().width;
+				framebufferInfo.height = WindowManager::GetExtent().height;
+				framebufferInfo.layers = 1;
+
+				if (vkCreateFramebuffer(PresentingDevice->GetVkDevice(), &framebufferInfo, nullptr, &Framebuffers[i]) != VK_SUCCESS) {
+					LOGGER.Critical("Failed to create Framebuffer", true);
+				}
+
+			}
+			LOGGER.Log("Framebuffers Created");
+
+			VkFenceCreateInfo fenceInfo{};
+			fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+			vkCreateFence(PresentingDevice->GetVkDevice(), &fenceInfo, nullptr, &PresentingFence);
 
 			Initialized = true;
 		}
@@ -137,9 +161,34 @@ Landmark::IO::Window::Window() : _Window([]()
 			glfwSetWindowShouldClose(_Window, state);
 		}
 
-		void Landmark::IO::Window::SwapBuffers()
+		void Landmark::IO::Window::PushNextFrame()
 		{
-			glfwSwapBuffers(_Window);
+	/*
+			auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
+			vkResetFences(device, 1, &PresentingFence);
+			
+			
+
+
+			uint32_t imageIndex;
+			vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, VK_NULL_HANDLE, PresentingFence, &imageIndex);
+
+
+			VkPresentInfoKHR presentInfo{};
+			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+			presentInfo.waitSemaphoreCount = 0;
+			VkSwapchainKHR swapChains[] = { swapChain };
+			presentInfo.swapchainCount = 1;
+			presentInfo.pSwapchains = swapChains;
+			presentInfo.pImageIndices = &imageIndex;
+
+			auto presentingTask = WindowManager::PresentTask;
+			vkQueuePresentKHR(presentingTask->GetOwner()->GetQueue(),&presentInfo);
+
+
+			vkWaitForFences(device, 1, &PresentingFence, VK_TRUE, UINT64_MAX);
+			*/
 		}
 
 

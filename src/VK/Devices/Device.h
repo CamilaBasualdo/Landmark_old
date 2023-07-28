@@ -6,6 +6,7 @@
 #include "Queue.h"
 #include "../Task.h"
 #include "PhysicalDevice.h"
+#include <list>
 namespace Landmark
 {
 	namespace Vk
@@ -40,8 +41,8 @@ namespace Landmark
 				VkDevice _LogicalDevice;
 
 				//sorted by [family][index]
-				using _QueueFamiliy = std::vector<Queue>;
-				std::vector<_QueueFamiliy> ActiveQueuesFamilies;
+				using _QueueFamiliy = std::list<Queue>;
+				std::map<uint32_t, _QueueFamiliy> ActiveQueuesFamilies;
 
 				std::vector<Task*> Tasks;
 
