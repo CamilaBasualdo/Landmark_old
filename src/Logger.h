@@ -57,6 +57,7 @@ namespace Landmark {
 		void Error(std::string log);
 		void Critical(std::string log, bool ThrowException = false);
 
+		void ChangeName(std::string _NewName) { Origin = _NewName; }
 
 	
 	};

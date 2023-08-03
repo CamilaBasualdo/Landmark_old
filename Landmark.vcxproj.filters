@@ -90,15 +90,15 @@
     <ClCompile Include="src\VK\GraphicsPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\Components\TestRenderComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Landmark.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Containers\BetterOctree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Containers\lobby.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Logger.h">
@@ -1064,10 +1064,16 @@
     <ClInclude Include="src\ECS\Component\Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Containers\AllocVector.h">
+    <ClInclude Include="src\VK\GraphicsPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\VK\GraphicsPipeline.h">
+    <ClInclude Include="src\Renderer\Components\TestRenderComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Entity\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Containers\AllocVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

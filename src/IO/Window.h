@@ -53,12 +53,18 @@ namespace Landmark
 			bool GetShouldClose();
 			void SetShouldClose(bool state);
 
-			void PushNextFrame();
+			
 			
 
 			void MakeCurrent();
+			uint32_t GetNextImageIndex() const;
+			VkFramebuffer GetFramebuffer(uint32_t Index);
+			void PushFramebuffer(uint32_t ImageIndex);
 
-			uvec2 GetWindowSize() const { return WindowSize; }
+			uvec2 GetWindowSize() const
+			{
+				return WindowSize;
+			}
 
 			
 		};

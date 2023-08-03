@@ -23,4 +23,28 @@ Landmark::Vk::Task::Task(std::string _Name, TaskIntensities _type): taskType(_ty
 {
 }
 
+void Landmark::Vk::Task::BeginRecord()
+{
+	VkCommandBufferBeginInfo info;
+	info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	info.flags = 0;
+	info.pInheritanceInfo = 0;
+	info.pNext = nullptr;
+	if (vkBeginCommandBuffer(CmdBuffer, &info) != VK_SUCCESS)
+	{
+		LOGGER.Error("Failed to Begin recording Command Buffer");
+	}
+	
+}
+
+
+
+void Landmark::Vk::Task::EndRecord()
+{
+	if (vkEndCommandBuffer(CmdBuffer) != VK_SUCCESS)
+	{
+		LOGGER.Error("Failed to End recording Command Buffer");
+	}
+}
+
 

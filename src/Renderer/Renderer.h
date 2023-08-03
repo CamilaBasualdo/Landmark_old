@@ -5,6 +5,7 @@
 #include "../logger.h"
 #include "../VK/Task.h"
 #include <thread>
+#include <VK/GraphicsPipeline.h>
 namespace Landmark::IO
 {
 	class Window;
@@ -25,6 +26,8 @@ namespace Landmark::Render
 		static inline bool CloseThread = false;
 
 		static inline VkRenderPass RenderPass;
+
+		static inline Vk::GraphicsPipeline DefaultGBufferShader;
 	public:
 
 		Renderer();
@@ -43,7 +46,11 @@ namespace Landmark::Render
 
 	private:
 		static void RenderingThreadStart();
-		void InitRenderPass();
+		static void InitRenderPass();
+		static void CreateDefaultGBufferShader();
+
+
+		static void Render();
 
 	public:
 		void Exit() override;

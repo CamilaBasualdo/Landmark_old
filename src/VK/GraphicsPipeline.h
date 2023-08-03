@@ -66,6 +66,9 @@ namespace Landmark::Vk
 		 DepthCompareOp DepthComparingOperation = DEPTH_OP_LESS_OR_EQUAL;
 
 	 public:
+
+		 VkPipeline GetPipeline() const { return graphicsPipeline; }
+
 		 GraphicsPipeline& AttachModule(ShaderStage stage, const std::vector<char>& src);
 		 GraphicsPipeline& SetDynamicStates(std::initializer_list<VkDynamicState> States);
 		 GraphicsPipeline& DefineInputAssembly(TopologyType _TopologyType);

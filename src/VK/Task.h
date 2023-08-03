@@ -42,13 +42,14 @@ namespace Landmark {
 		public:
 			Task(std::string _Name,TaskIntensities _type);
 			bool IsInitialized() { return Initialized; }
-			void Begin();
-
-			void End();
+			void BeginRecord();
+			
+			void EndRecord();
 
 
 
 			void Upload();
+			VkCommandBuffer GetCmdBuffer() const { return CmdBuffer; }
 
 			Queue* GetOwner() const { return Owner; }
 		};

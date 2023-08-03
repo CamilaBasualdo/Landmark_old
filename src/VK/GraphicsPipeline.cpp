@@ -17,15 +17,18 @@ Landmark::Vk::GraphicsPipeline& Landmark::Vk::GraphicsPipeline::AttachModule(Sha
 	createInfo.codeSize = src.size();
 	createInfo.pCode = reinterpret_cast<const uint32_t*>(src.data());
 
-	ShaderModules.at(stage) = {};
+	ShaderModules.insert(std::pair<ShaderStage,VkShaderModule>(stage,{}));
+	
 
 	auto& target = ShaderModules.at(stage);
 	
 	if (vkCreateShaderModule(Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice(), &createInfo, nullptr, &target) != VK_SUCCESS) {
 		LOGGER.Error("Failed to create Shader Module");
 		ShaderModules.erase(stage);
+		return *this;
 	}
-	
+	LOGGER.Log("Shader Module of type " + std::string(string_VkShaderStageFlagBits(static_cast<VkShaderStageFlagBits>(stage))) + " Created");
+	return *this;
 }
 
 Landmark::Vk::GraphicsPipeline& Landmark::Vk::GraphicsPipeline::SetDynamicStates(
@@ -104,6 +107,8 @@ void Landmark::Vk::GraphicsPipeline::Build()
 		createInfo.pName = "main";
 		createInfo.module = Module.second;
 		createInfo.stage = static_cast<VkShaderStageFlagBits>(Module.first);
+		createInfo.pNext = nullptr;
+		createInfo.pSpecializationInfo = nullptr;
 		shader_stage_create_infos.push_back(createInfo);
 
 	}
@@ -143,6 +148,7 @@ void Landmark::Vk::GraphicsPipeline::Build()
 	rasterizer.polygonMode = static_cast<VkPolygonMode>(polygonMode);
 	rasterizer.depthBiasEnable = DepthClampEnable;
 	rasterizer.cullMode = static_cast<VkCullModeFlags>(cullingMode);
+	rasterizer.lineWidth = 1.0f;
 	rasterizer.rasterizerDiscardEnable = DiscardEnable;
 	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
@@ -165,7 +171,7 @@ void Landmark::Vk::GraphicsPipeline::Build()
 	DepthStencil.depthTestEnable = DepthTestingState;
 	DepthStencil.depthWriteEnable = DepthWritingState;
 	DepthStencil.depthCompareOp = static_cast<VkCompareOp>(DepthComparingOperation);
-
+	DepthStencil.pNext = nullptr;
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_FALSE;

@@ -113,6 +113,7 @@
     <ClCompile Include="src_demo\Demo.cpp" />
     <ClCompile Include="src\VK\Task.cpp" />
     <ClCompile Include="src\ECS\Transform\Transform.cpp" />
+    <ClCompile Include="src\Renderer\Components\TestRenderComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\GLM\glm\common.hpp" />
@@ -404,6 +405,7 @@
     <ClInclude Include="include\GLM\glm\vector_relational.hpp" />
     <ClInclude Include="src\Containers\AllocVector.h" />
     <ClInclude Include="src\ECS\Component\Component.h" />
+    <ClInclude Include="src\ECS\Entity\Entity.h" />
     <ClInclude Include="src\General_Utils.h" />
     <ClInclude Include="src\VK\GraphicsPipeline.h" />
     <ClInclude Include="src_demo\GameManager.h" />
@@ -427,7 +429,6 @@
     <ClInclude Include="src\VK\Devices\Extension.h" />
     <ClInclude Include="src\VK\Devices\Layer.h" />
     <ClInclude Include="src\Containers\BetterOctree.h" />
-    <ClInclude Include="src\Containers\lobby.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\EventSystem.h" />
@@ -441,6 +442,7 @@
     <ClInclude Include="src\VK\Vulkan.h" />
     <ClInclude Include="src\VK\Task.h" />
     <ClInclude Include="src\ECS\Transform\Transform.h" />
+    <ClInclude Include="src\Renderer\Components\TestRenderComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="include\GLFW\lib\glfw3.lib" />

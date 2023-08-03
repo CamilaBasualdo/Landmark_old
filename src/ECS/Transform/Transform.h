@@ -6,20 +6,16 @@ namespace Landmark::ECS
 {
 	class Transform :Component<Transform>
 	{
-		int pos;
+
 		vec3  Position;
 		quat Rotation;
 		vec3 Scale;
 
 
-		Transform(): Component<Transform>()
-		{
-			
-			std::cout << "Testing Transform Component";
-		}
+		
 	};
 
-	
+
 
 
 }

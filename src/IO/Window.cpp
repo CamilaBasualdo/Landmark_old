@@ -161,17 +161,16 @@ Landmark::IO::Window::Window() : _Window([&]()
 			glfwSetWindowShouldClose(_Window, state);
 		}
 
-		void Landmark::IO::Window::PushNextFrame()
+		void Landmark::IO::Window::PushFramebuffer(uint32_t ImageIndex)
 		{
-	/*
+	
 			auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
 			vkResetFences(device, 1, &PresentingFence);
 			
 			
 
 
-			uint32_t imageIndex;
-			vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, VK_NULL_HANDLE, PresentingFence, &imageIndex);
+			
 
 
 			VkPresentInfoKHR presentInfo{};
@@ -181,14 +180,14 @@ Landmark::IO::Window::Window() : _Window([&]()
 			VkSwapchainKHR swapChains[] = { swapChain };
 			presentInfo.swapchainCount = 1;
 			presentInfo.pSwapchains = swapChains;
-			presentInfo.pImageIndices = &imageIndex;
+			presentInfo.pImageIndices = &ImageIndex;
 
 			auto presentingTask = WindowManager::PresentTask;
 			vkQueuePresentKHR(presentingTask->GetOwner()->GetQueue(),&presentInfo);
 
 
 			vkWaitForFences(device, 1, &PresentingFence, VK_TRUE, UINT64_MAX);
-			*/
+			
 		}
 
 
@@ -197,3 +196,16 @@ Landmark::IO::Window::Window() : _Window([&]()
 		{
 			glfwMakeContextCurrent(_Window);
 		}
+
+		uint32_t Landmark::IO::Window::GetNextImageIndex() const
+{
+	auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
+	uint32_t imageIndex;
+	vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, VK_NULL_HANDLE, PresentingFence, &imageIndex);
+	return imageIndex;
+}
+
+VkFramebuffer Landmark::IO::Window::GetFramebuffer(uint32_t Index)
+{
+	return Framebuffers[Index];
+}

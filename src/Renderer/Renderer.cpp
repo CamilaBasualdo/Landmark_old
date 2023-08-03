@@ -7,6 +7,8 @@
 #include "../IO/WindowManager.h"
 #include "../VK/Devices/DeviceManager.h"
 #include <sstream>
+#include <fstream>
+#include "Components/TestRenderComponent.h"
 namespace Landmark
 {
 	class Engine;
@@ -60,6 +62,7 @@ namespace Landmark
 					InitRenderPass();
 					LOGGER.Log("Render Pass Created");
 					Dispatch<Event_RendererInit>();
+					CreateDefaultGBufferShader();
 					RenderingThread = std::thread(RenderingThreadStart);
 					LOGGER.Log("Rendering Thread Dispatched");
 			});
@@ -124,6 +127,75 @@ namespace Landmark
 				loginfo <<"\n" << i << " " << string_VkPipelineBindPoint(renderPassInfo.pSubpasses[i].pipelineBindPoint);
 			LOGGER.Log( loginfo.str());
 		}
+		static std::vector<char> readFile(const std::string& filename) {
+			std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+			if (!file.is_open()) {
+				throw std::runtime_error("failed to open file!");
+			}
+			size_t fileSize = (size_t)file.tellg();
+			std::vector<char> buffer(fileSize);
+			file.seekg(0);
+			file.read(buffer.data(), fileSize);
+			file.close();
+
+			return buffer;
+		}
+		void Renderer::CreateDefaultGBufferShader()
+		{
+			
+
+			DefaultGBufferShader
+				.AttachModule(Vk::GraphicsPipeline::VERTEX, readFile("Deferred.vert.spv"))
+				.AttachModule(Vk::GraphicsPipeline::FRAGMENT, readFile("Deferred.frag.spv"))
+				.Build();
+		}
+
+		void Renderer::Render()
+		{
+			auto& window = IO::WindowManager::MainWindow();
+			RenderingTask->BeginRecord();
+
+			auto cmdBuffer = RenderingTask->GetCmdBuffer();
+			VkRenderPassBeginInfo info;
+			info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			info.renderPass = RenderPass;
+			info.clearValueCount = 1;
+			VkClearValue clearColor = { 0.0f,0.0f,0.0f,1.0f };
+			info.pClearValues = &clearColor;
+			info.pNext = nullptr;
+			uint32_t imageindex = window.GetNextImageIndex();
+			info.framebuffer = window.GetFramebuffer(imageindex);
+			info.renderArea.offset = { 0,0 };
+			auto size = window.GetWindowSize();
+			info.renderArea.extent = { size.x,size.y };
+			vkCmdBeginRenderPass(cmdBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+
+			VkViewport vp;
+			vp.x = 0;
+			vp.y = 0;
+			vp.width = size.x;
+			vp.height = size.y;
+			vp.minDepth = 0.0f;
+			vp.maxDepth = 1.0f;
+			vkCmdSetViewport(cmdBuffer,0,1, &vp);
+
+			VkRect2D scissor;
+			scissor.offset = { 0,0 };
+			scissor.extent = { size.x,size.y };
+			vkCmdSetScissor(cmdBuffer, 0, 1, &scissor);
+
+			vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DefaultGBufferShader.GetPipeline());
+			vkCmdDraw(cmdBuffer, 3, 1, 0, 0);
+			for (auto& comp : TestRenderComponent::STORAGE)
+			{
+				comp.Render();
+			}
+			vkCmdEndRenderPass(cmdBuffer);
+			RenderingTask->EndRecord();
+			window.PushFramebuffer(imageindex);
+		}
+
 
 		void Renderer::RenderingThreadStart()
 		{
@@ -136,8 +208,8 @@ namespace Landmark
 				if (IO::WindowManager::MainWindow().GetShouldClose())
 					Engine::Shutdown();
 
-
-				IO::WindowManager::MainWindow().PushNextFrame();
+				Render();
+				
 			}
 		}
 

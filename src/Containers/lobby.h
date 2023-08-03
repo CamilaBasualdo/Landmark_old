@@ -7,7 +7,7 @@
 
 
 template<typename T>
-class lobby
+class lobby_Decrapated
 {
 public:
 	typedef size_t pos_type;
@@ -24,14 +24,14 @@ public:
 	friend class iterator;
 	class iterator //: public std::iterator<std::random_access_iterator_tag, pos_type, T, T*, T&>
 	{
-		friend lobby;
+		friend lobby_Decrapated;
 	protected:
 		std::vector<T>::const_iterator it;
 		pos_type index;
-		const lobby* owner;
+		const lobby_Decrapated* owner;
 
 		//iterator();
-		iterator(lobby* _owner, pos_type _index) :owner(_owner), index(_index) {
+		iterator(lobby_Decrapated* _owner, pos_type _index) :owner(_owner), index(_index) {
 			it = owner->_vector.begin() += index;
 
 		}
@@ -84,22 +84,22 @@ public:
 	friend class address;
 	class address
 	{
-		friend lobby;
+		friend lobby_Decrapated;
 	public:
 		address() :_owner(nullptr), Location(-1) {
 
 		}
 		template <typename O>
 		address(O& other) 
-			:_owner(reinterpret_cast<lobby<T>* const>(static_cast<void* const>(other.GetOwner())))
+			:_owner(reinterpret_cast<lobby_Decrapated<T>* const>(static_cast<void* const>(other.GetOwner())))
 		,Location(other.GetLocation()){
 		}
 	protected:
-		address(lobby* owner, pos_type pos) : _owner(owner), Location(pos)
+		address(lobby_Decrapated* owner, pos_type pos) : _owner(owner), Location(pos)
 		{
 
 		}
-		lobby* const _owner;
+		lobby_Decrapated* const _owner;
 		const pos_type Location;
 
 	public:
@@ -107,19 +107,19 @@ public:
 		// template <typename A> operator lobby<A>::address() {
 		//	 return lobby<A>::address(static_cast<A>(*this));
 		//}
-		lobby* const GetOwner() const {   return _owner; }
+		lobby_Decrapated* const GetOwner() const {   return _owner; }
 		pos_type GetLocation() const { return Location; }
 		T& operator*() { return _owner->operator[](Location); }
 		bool Valid() { return _owner && (Location >= 0 && Location < _owner._vector.size()) &&!_markers.contains(Location); }
 	};
 
-	lobby(size_t capacity = 0) : _vector(capacity), _markers()
+	lobby_Decrapated(size_t capacity = 0) : _vector(capacity), _markers()
 	{
 
 	}
 
 	//WRONG
-	iterator Begin() {
+	iterator begin() {
 
 		if (_vector.empty() || _markers.empty())
 			return iterator(this, (pos_type)0);
