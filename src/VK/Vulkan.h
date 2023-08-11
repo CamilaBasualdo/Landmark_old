@@ -37,8 +37,8 @@ namespace Landmark
 			
 			
 
-			// Inherited via Module
-			virtual std::string GetName() const override;
+			
+			
 			virtual void PreInit() override;
 			virtual void Init() override;
 			virtual void PostInit() override;

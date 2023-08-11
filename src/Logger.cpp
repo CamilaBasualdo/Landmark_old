@@ -45,7 +45,12 @@ namespace Landmark {
 	{
 		Log(log, white, red);
 		if (ThrowException)
+		{
+			LogSystem::Log2File();
 			throw std::runtime_error(log);
+			
+		}
+			
 	}
 
 }

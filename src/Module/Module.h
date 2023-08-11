@@ -10,8 +10,7 @@ namespace Landmark {
 
 		}
 
-		// Inherited via ModuleBase
-		virtual std::string GetName() const = 0;
+		
 
 		
 		virtual void PreInit(){};

@@ -97,7 +97,7 @@ Landmark::Vk::GraphicsPipeline& Landmark::Vk::GraphicsPipeline::SetDepthState(bo
 
 void Landmark::Vk::GraphicsPipeline::Build()
 {
-	auto& Device = DeviceManager::GetMainPresentingDevice()->GetVkDevice();
+	auto Device = DeviceManager::GetMainPresentingDevice()->GetVkDevice();
 
 	std::vector<VkPipelineShaderStageCreateInfo> shader_stage_create_infos;
 	for (auto& Module : ShaderModules)

@@ -18,7 +18,7 @@ namespace Landmark
 			}
 		}
 
-		VkQueue& Device::GetQueue(int Family, int QueueIndex )
+		VkQueue Device::GetQueue(int Family, int QueueIndex ) const
 		{
 			VkQueue q;
 			

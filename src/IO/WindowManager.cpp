@@ -2,7 +2,7 @@
 #include "../VK/VulkanEvents.h"
 #include "GLFW/glfw3.h"
 #include "../Renderer/Renderer.h"
-
+#include <Events/EventCollection/WindowEvents.h>
 
 Landmark::IO::WindowManager::WindowManager()
 {
@@ -11,11 +11,11 @@ Landmark::IO::WindowManager::WindowManager()
 
 void Landmark::IO::WindowManager::PreInit()
 {
-	SubscribeTo<Vk::Event_GpuTaskRequest>([&](Vk::Event_GpuTaskRequest& e) {
+	SubscribeTo<Events::Event_GpuTaskRequest>([&](Events::Event_GpuTaskRequest& e) {
 		//LOGGER.Log("Requesting Main Rendering Task on Device 0 (HARDCODED) Type: " + std::string(string_VkPhysicalDeviceType(e.AvailableDevices[0].deviceProperties.deviceType)));
 
 
-		Vk::Event_GpuTaskRequest::TaskRequest request = {
+		Events::Event_GpuTaskRequest::TaskRequest request = {
 			"Window Presenting Task",
 			Vk::Task::TaskIntensities::MEDIUM,
 			e.AvailableDevices[0].DeviceID,
@@ -34,24 +34,24 @@ void Landmark::IO::WindowManager::PreInit()
 			for (auto& Window : _Windows)
 				Window.Init();
 
-
+			
 
 		});
 
-	SubscribeTo<Vk::Event_VulkanInstanceInit>([&](Vk::Event_VulkanInstanceInit& e)
+	SubscribeTo<Events::Event_VulkanInstanceInit>([&](Events::Event_VulkanInstanceInit& e)
 		{
 			LOGGER.Log("Vulkan Instance Finished. Creating Main Surface & Window");
 			_MainWindow = CreateWindow();
 			
-			Dispatch<Event_MainSurfaceInit>();
+			Dispatch<Events::WM_MainSurfaceinitEvent>();
 		});
 	
-	SubscribeTo<Vk::Event_VulkanDeviceInit>([&](Vk::Event_VulkanDeviceInit& e)
+	SubscribeTo<Events::Event_VulkanDeviceInit>([&](Events::Event_VulkanDeviceInit& e)
 	{
 			LOGGER.Log("Device Manager Finished. Chooseing Formats");
 			SelectFormats();
 			LOGGER.Log("Formats Selected");
-			Dispatch<Event_WindowFormatsSelected>();
+			Dispatch<Events::WM_SurfaceFormatsSelectedEvent>();
 	});
 
 	
@@ -160,6 +160,7 @@ void Landmark::IO::WindowManager::DestroyWindow(Window* _window)
 	{
 		if (&(*it) == _window)
 		{
+			(*it).Destroy();
 			_Windows.erase(it);
 			return;
 		}
@@ -168,7 +169,17 @@ void Landmark::IO::WindowManager::DestroyWindow(Window* _window)
 
 void Landmark::IO::WindowManager::Update()
 {
+	
 	glfwPollEvents();
+}
+
+void Landmark::IO::WindowManager::Exit()
+{
+	
+	for (auto& window : _Windows)
+		window.Destroy();
+	_Windows.clear();
+
 }
 
 

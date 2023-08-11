@@ -26,14 +26,16 @@ namespace Landmark::Render
 		static inline bool CloseThread = false;
 
 		static inline VkRenderPass RenderPass;
+		static inline VkSemaphore RenderFinishedSemaphore;
+		static inline VkFence inFlightFence; //to make sure only one frame is rendered at a time
 
 		static inline Vk::GraphicsPipeline DefaultGBufferShader;
 	public:
 
 		Renderer();
 
-		// Inherited via IModule
-		virtual std::string GetName() const override;
+		
+		
 
 		virtual void PreInit() override;
 
@@ -53,7 +55,7 @@ namespace Landmark::Render
 		static void Render();
 
 	public:
-		void Exit() override;
+		void PreExit() override;
 	};
 }
 

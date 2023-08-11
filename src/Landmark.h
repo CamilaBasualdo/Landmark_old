@@ -74,7 +74,7 @@ namespace Landmark
 				return;
 			}
 			_EngineModules[&typeid(T)] = reinterpret_cast<Module*>(new T(std::forward<Args>(args)...));
-			LOGGER.Log("Registered Module (" + std::string(typeid(T).name()).substr(6) + ") ");
+			
 		}
 
 		static void Init(EngineInitParameters p);

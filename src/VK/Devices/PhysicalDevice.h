@@ -63,7 +63,7 @@ namespace Landmark
 			const bool PresentCapable;
 			const PresentCapabilities_T* presentCapabilities = nullptr;
 
-		protected:
+		public:
 			VkPhysicalDevice GetVkDevice()const { return _PhysicalDevice; }
 			
 		public:

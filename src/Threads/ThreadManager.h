@@ -23,7 +23,7 @@ namespace Landmark::Threads
 			//return &_Threads.back();
 			//return new Thread(std::forward<Function>(f),std::forward<Args>(args...).);
 		}
-		std::string GetName() const override;
+		
 		void PreInit() override;
 		void Init() override;
 		void PostInit() override;

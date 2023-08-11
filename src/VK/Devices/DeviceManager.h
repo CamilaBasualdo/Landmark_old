@@ -30,7 +30,7 @@ namespace Landmark {
 
 
 			static void InitializeDevices();
-			static void InitDevice(const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Event_GpuTaskRequest::FullTaskRequest>>&);
+			static void InitDevice(const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Events::Event_GpuTaskRequest::FullTaskRequest>>&);
 			static void EnumerateDevices();
 
 			

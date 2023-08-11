@@ -5,53 +5,71 @@
 #include <vulkan/vk_enum_string_helper.h>
 #include "WindowManager.h"
 #include "../Renderer/Renderer.h"
+
+void TestCallback(GLFWwindow* test, int test2, int test3)
+{
+	std::cout << "IDK MAN\n";
+}
 Landmark::IO::Window::Window() : _Window([&]()
 	{
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		auto Window = glfwCreateWindow(WindowSize.x, WindowSize.y, "Default Window Title", NULL, NULL);
-		if (!Window)
+		auto window = glfwCreateWindow(WindowSize.x, WindowSize.y, "Default Window Title", NULL, NULL);
+		if (!window)
+		{
 			LOGGER.Error("Failed to create GLFW Window");
+			return (GLFWwindow*)nullptr;
+		}
 		else
 			LOGGER.Log("Window Created");
-		return Window;
-	}()), _Surface([this]()
-		{
-			VkSurfaceKHR surface;
-			VkResult Result = glfwCreateWindowSurface(Vk::Vulkan::GetVkInstance(), _Window, nullptr, &surface);
-			if (Result != VK_SUCCESS)
-				LOGGER.Error("Failed to create Window Surface");
-			else
-				LOGGER.Log("Vulkan Surface Created");
 
 
-			return surface;
+		//callbacks
+		
 
+		
+		
+		
+		return window;
+	}()),
+
+	_Surface([this]() {
+		VkSurfaceKHR surface;
+		VkResult Result = glfwCreateWindowSurface(Vk::Vulkan::GetVkInstance(), _Window, nullptr, &surface);
+		if (Result != VK_SUCCESS)
+			LOGGER.Error("Failed to create Window Surface");
+		else
+			LOGGER.Log("Vulkan Surface Created");
+
+
+		return surface;
 		}())
-		/*, _DeviceAssosiated([this]()
-		{
-				uint32_t deviceCount = 0;
-				vkEnumeratePhysicalDevices(Vk::Vulkan::GetVkInstance() , & deviceCount, nullptr);
-
-				// Allocate memory for physical devices
-				std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-				vkEnumeratePhysicalDevices(Vk::Vulkan::GetVkInstance(), &deviceCount, physicalDevices.data());
-
-				// Find the physical device that supports the surface
-				for (const auto& device : physicalDevices) {
-					VkBool32 surfaceSupported = VK_FALSE;
-					//vkGetPhysicalDeviceSurfaceSupportKHR(device, queueFamilyIndex, surface, &surfaceSupported);
-
-					if (surfaceSupported == VK_TRUE) {
-						return device;
-					}
-				}
-		}())*/
 {
+	glfwSetWindowUserPointer(_Window, this);
+	glfwSetWindowSizeCallback(_Window, [](GLFWwindow* window, int width, int height) -> void {
+		static_cast<Window*>(glfwGetWindowUserPointer(window))->ResizeCallback(width, height);
+		});
+
+	glfwSetFramebufferSizeCallback(_Window, [](GLFWwindow* window, int width, int height) -> void
+		{
+			static_cast<Window*>(glfwGetWindowUserPointer(window))->FramebufferSizeCallback(width, height);
+		});
+
+	glfwSetWindowCloseCallback(_Window, [](GLFWwindow* window)-> void
+		{
+			static_cast<Window*>(glfwGetWindowUserPointer(window))->CloseCallback();
+		});
 	if (Vk::DeviceManager::GetMainPresentingDevice())
 		Init();
+
+
 }
 
 
+		void Landmark::IO::Window::Destroy()
+		{
+			glfwDestroyWindow(_Window);
+			LOGGER.Log("Window Destroyed");
+		}
 
 		void Landmark::IO::Window::Init()
 		{
@@ -70,7 +88,7 @@ Landmark::IO::Window::Window() : _Window([&]()
 			createInfo.imageExtent = WindowManager::GetExtent();
 			createInfo.imageArrayLayers = 1;
 			createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	
+
 
 			/*
 			VK_SHARING_MODE_EXCLUSIVE: An image is owned by one queue family at a time and ownership must be explicitly transferred before using it in another queue family. This option offers the best performance.
@@ -146,10 +164,20 @@ Landmark::IO::Window::Window() : _Window([&]()
 
 			VkFenceCreateInfo fenceInfo{};
 			fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-			vkCreateFence(PresentingDevice->GetVkDevice(), &fenceInfo, nullptr, &PresentingFence);
+			vkCreateFence(PresentingDevice->GetVkDevice(), &fenceInfo, nullptr, &ImageAquiringFence);
+
+			VkSemaphoreCreateInfo SemaphoreInfo{};
+			SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+			SemaphoreInfo.flags = 0;
+			SemaphoreInfo.pNext = nullptr;
+			vkCreateSemaphore(PresentingDevice->GetVkDevice(), &SemaphoreInfo, nullptr, &ImageAvailableSemaphore);
+			LOGGER.Log("Semaphore Created");
+
 
 			Initialized = true;
 		}
+
+
 
 		bool Landmark::IO::Window::GetShouldClose()
 		{
@@ -161,35 +189,19 @@ Landmark::IO::Window::Window() : _Window([&]()
 			glfwSetWindowShouldClose(_Window, state);
 		}
 
-		void Landmark::IO::Window::PushFramebuffer(uint32_t ImageIndex)
+		VkFramebuffer Landmark::IO::Window::GetNextImage(uint32_t* ImageIndex)
 		{
-	
 			auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
-			vkResetFences(device, 1, &PresentingFence);
-			
-			
+			uint32_t Image;
 
+			vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, ImageAvailableSemaphore, ImageAquiringFence, &Image);
 
-			
+			vkWaitForFences(device, 1, &ImageAquiringFence, VK_TRUE, UINT64_MAX);
 
-
-			VkPresentInfoKHR presentInfo{};
-			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-			presentInfo.waitSemaphoreCount = 0;
-			VkSwapchainKHR swapChains[] = { swapChain };
-			presentInfo.swapchainCount = 1;
-			presentInfo.pSwapchains = swapChains;
-			presentInfo.pImageIndices = &ImageIndex;
-
-			auto presentingTask = WindowManager::PresentTask;
-			vkQueuePresentKHR(presentingTask->GetOwner()->GetQueue(),&presentInfo);
-
-
-			vkWaitForFences(device, 1, &PresentingFence, VK_TRUE, UINT64_MAX);
-			
+			vkResetFences(device, 1, &ImageAquiringFence);
+			*ImageIndex = Image;
+			return Framebuffers[Image];
 		}
-
 
 
 		void Landmark::IO::Window::MakeCurrent()
@@ -197,15 +209,34 @@ Landmark::IO::Window::Window() : _Window([&]()
 			glfwMakeContextCurrent(_Window);
 		}
 
-		uint32_t Landmark::IO::Window::GetNextImageIndex() const
+		void Landmark::IO::Window::Present(const std::vector<VkSemaphore>& WaitSemaphores, uint32_t ImageIndex)
+		{
+			VkPresentInfoKHR info{};
+			info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+			info.pImageIndices = &ImageIndex;
+			info.swapchainCount = 1;
+			info.pSwapchains = &swapChain;
+			info.waitSemaphoreCount = WaitSemaphores.size();
+			info.pWaitSemaphores = WaitSemaphores.data();
+
+			
+			vkQueuePresentKHR(WindowManager::PresentTask->GetOwner()->GetQueue(), &info);
+			
+		}
+
+void Landmark::IO::Window::ResizeCallback(int sizeX, int sizeY)
 {
-	auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
-	uint32_t imageIndex;
-	vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, VK_NULL_HANDLE, PresentingFence, &imageIndex);
-	return imageIndex;
+	
 }
 
-VkFramebuffer Landmark::IO::Window::GetFramebuffer(uint32_t Index)
+void Landmark::IO::Window::FramebufferSizeCallback(int sizeX, int sizeY)
 {
-	return Framebuffers[Index];
+	WindowSize = { sizeX,sizeY };
+	
 }
+
+void Landmark::IO::Window::CloseCallback()
+{
+	LOGGER.Log("Window Should Close");
+}
+

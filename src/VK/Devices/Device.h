@@ -51,8 +51,8 @@ namespace Landmark
 
 			public:
 				const PhysicalDevice& GetPhysicalDevice() { return *_PhysicalDevice; }
-				VkDevice& GetVkDevice() { return _LogicalDevice; }
-				VkQueue& GetQueue(int QueueFamily, int QueueIndex);
+				VkDevice GetVkDevice() const { return _LogicalDevice; }
+				VkQueue GetQueue(int QueueFamily, int QueueIndex) const;
 				struct DeviceCreateInfo
 				{
 					VkDeviceCreateInfo createinfo;

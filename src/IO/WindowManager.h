@@ -13,8 +13,7 @@ namespace Landmark
 
 namespace Landmark::IO
 {
-	class Event_MainSurfaceInit : Events::Event {};
-	class Event_WindowFormatsSelected: Events::Event {};
+	
 
 
 	class WindowManager : Module, Events::EventSubscriber, Events::EventDispatcher
@@ -52,7 +51,7 @@ namespace Landmark::IO
 			VK_PRESENT_MODE_FIFO_KHR
 		};
 		WindowManager();
-		std::string GetName() const override { return "WindowManager"; }
+		
 		void PreInit() override;
 		void Init() override;
 		void PostInit() override;
@@ -66,6 +65,13 @@ namespace Landmark::IO
 
 		
 		void Update() override;
+
+
+		void Exit() override;
+
+
+	protected:
+
 	};
 }
 

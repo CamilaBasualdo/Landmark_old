@@ -16,7 +16,7 @@ namespace Landmark::Audio
 		static void ListDevices();
 
 	public:
-		std::string GetName() const override { return "AudioSystem"; }
+		
 		void Init() override;
 		void Exit() override;
 	};

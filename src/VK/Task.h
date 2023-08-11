@@ -42,10 +42,10 @@ namespace Landmark {
 		public:
 			Task(std::string _Name,TaskIntensities _type);
 			bool IsInitialized() { return Initialized; }
+			void Reset();
 			void BeginRecord();
-			
 			void EndRecord();
-
+			void Submit(const std::vector<VkSemaphore>& waitSemaphores = {}, const VkPipelineStageFlags WaitStages = {},const std::vector<VkSemaphore>& SignalSemaphores = {} , VkFence CompletionFence = VK_NULL_HANDLE);
 
 
 			void Upload();

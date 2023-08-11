@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vulkan/vk_enum_string_helper.h>
 #include "../IO/WindowManager.h"
+#include <Events/EventCollection/WindowEvents.h>
 namespace Landmark
 {
 	namespace Vk
@@ -115,14 +116,11 @@ namespace Landmark
 		
 	
 
-		std::string Vulkan::GetName() const
-		{
-			return std::string();
-		}
+		
 
 		void Vulkan::PreInit()
 		{
-			SubscribeTo<IO::Event_MainSurfaceInit>([&](IO::Event_MainSurfaceInit& e){
+			SubscribeTo<Events::WM_MainSurfaceinitEvent>([&](Events::WM_MainSurfaceinitEvent& e){
 				LOGGER.Log("Main Surface Created. Initializing Devices");
 			DeviceManager::Init(); });
 			
@@ -136,7 +134,7 @@ namespace Landmark
 			
 			InstanceInit();
 
-			Dispatch<Event_VulkanInstanceInit>();
+			Dispatch<Events::Event_VulkanInstanceInit>();
 		
 		}
 
@@ -153,11 +151,11 @@ namespace Landmark
 		void GLFW_ErrorCabllack(int errorcode, const char* desc)
 		{
 			static Logger _GlfwLogger = Logger("GLFW");
-			_GlfwLogger.Log(desc);
+			_GlfwLogger.Error(desc);
 		}
 		void Vulkan::InstanceInit()
 		{
-			auto EventReturn = Dispatch<Event_VulkanInstancePreInit>();
+			auto EventReturn = Dispatch<Events::Event_VulkanInstancePreInit>();
 			LOGGER.Debug("Initializing GLFW");
 			if (!glfwInit()) {
 				const char* Desc;
@@ -168,6 +166,7 @@ namespace Landmark
 			}
 			else
 			{
+				
 				LOGGER.Log("GLFW Init");
 				glfwSetErrorCallback(GLFW_ErrorCabllack);
 			}
@@ -181,7 +180,7 @@ namespace Landmark
 			appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 			appInfo.pEngineName = "Landmark Engine";
 			appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-			appInfo.apiVersion = VK_API_VERSION_1_0;
+			appInfo.apiVersion = VK_API_VERSION_1_1;
 
 
 			VkInstanceCreateInfo createInfo{};
@@ -201,7 +200,7 @@ namespace Landmark
 
 			
 			RequestedExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-			RequestedExtensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+			//RequestedExtensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 			createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 
 			createInfo.enabledExtensionCount = RequestedExtensions.size();

@@ -23,6 +23,11 @@ Landmark::Vk::Task::Task(std::string _Name, TaskIntensities _type): taskType(_ty
 {
 }
 
+void Landmark::Vk::Task::Reset()
+{
+	vkResetCommandBuffer(CmdBuffer, 0);
+}
+
 void Landmark::Vk::Task::BeginRecord()
 {
 	VkCommandBufferBeginInfo info;
@@ -44,6 +49,25 @@ void Landmark::Vk::Task::EndRecord()
 	if (vkEndCommandBuffer(CmdBuffer) != VK_SUCCESS)
 	{
 		LOGGER.Error("Failed to End recording Command Buffer");
+	}
+}
+
+void Landmark::Vk::Task::Submit(const std::vector<VkSemaphore>& waitSemaphores,
+	const VkPipelineStageFlags WaitStages, const std::vector<VkSemaphore>& SignalSemaphores,VkFence CompletionFence)
+{
+	VkSubmitInfo info{};
+	info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	info.commandBufferCount = 1;
+	info.pCommandBuffers = &CmdBuffer;
+	info.pNext = nullptr;
+	info.waitSemaphoreCount = waitSemaphores.size();
+	info.pWaitSemaphores = waitSemaphores.data();
+	info.signalSemaphoreCount = SignalSemaphores.size();
+	info.pSignalSemaphores = SignalSemaphores.data();
+	info.pWaitDstStageMask = &WaitStages;
+
+	if (vkQueueSubmit(Owner->GetQueue(), 1, &info, CompletionFence) != VK_SUCCESS) {
+		LOGGER.Error("Failed to submit command buffer!");
 	}
 }
 

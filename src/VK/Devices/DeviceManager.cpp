@@ -12,16 +12,23 @@ namespace Landmark
 	{
 		void DeviceManager::EnumerateDevices()
 		{
+
 			uint32_t deviceCount = 0;
+
 			vkEnumeratePhysicalDevices(Vulkan::GetVkInstance(), &deviceCount, nullptr);
 
 
 			if (deviceCount == 0)
+			{
+
 				LOGGER.Critical("No GPUs With Vulkan support found!", true);
+			}
+				
 
 
 			std::vector<VkPhysicalDevice> devices(deviceCount);
 			vkEnumeratePhysicalDevices(Vulkan::GetVkInstance(), &deviceCount, devices.data());
+
 			PhysicalDevices.reserve(deviceCount);
 			PhysicalDevice::PhysicalDeviceID i = 0;
 			for (auto device : devices)
@@ -48,14 +55,14 @@ namespace Landmark
 			
 			LOGGER.Log("Init");
 			EnumerateDevices();
-
+	
 			InitializeDevices();
 		}
 
 
 		void DeviceManager::InitializeDevices()
 		{
-			Event_GpuTaskRequest e = Dispatch<Event_GpuTaskRequest>();
+			Events::Event_GpuTaskRequest e = Dispatch<Events::Event_GpuTaskRequest>();
 			auto Requests = e.GetRequests();
 
 
@@ -66,13 +73,13 @@ namespace Landmark
 				InitDevice(request);
 			}
 
-			Dispatch<Event_VulkanDeviceInit>();
+			Dispatch<Events::Event_VulkanDeviceInit>();
 		}
 
 		void DeviceManager::InitDevice(
-			const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Event_GpuTaskRequest::FullTaskRequest>>& Requests)
+			const std::pair<PhysicalDevice::PhysicalDeviceID, std::vector<Events::Event_GpuTaskRequest::FullTaskRequest>>& Requests)
 		{
-			
+		
 			PhysicalDevice& Device = PhysicalDevices[Requests.first];
 			LOGGER.Log("Device Queues Init for " + Device.Name);
 			struct QueueUsage

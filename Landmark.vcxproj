@@ -57,7 +57,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_VULKAN;INCLUDE_GENERAL=#include &lt;glm/glm.hpp&gt; using namespace glm;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\GLFW\include;$(VULKAN_SDK)\include;$(SolutionDir)include\OpenAL\include;D:\Dropbox\Landmark\include\Boost;$(SolutionDir)include\GLM;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\IMGUI;$(SolutionDir)include\GLFW\include;$(VULKAN_SDK)\include;$(SolutionDir)include\OpenAL\include;D:\Dropbox\Landmark\include\Boost;$(SolutionDir)include\GLM;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -89,6 +89,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\GLM\glm\detail\glm.cpp" />
+    <ClCompile Include="include\IMGUI\imgui.cpp" />
+    <ClCompile Include="include\IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="include\IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="include\IMGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="include\IMGUI\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="include\IMGUI\imgui_tables.cpp" />
+    <ClCompile Include="include\IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="src\Debug\ImguiModule.cpp" />
     <ClCompile Include="src\VK\GraphicsPipeline.cpp" />
     <ClCompile Include="src_demo\GameManager.cpp" />
     <ClCompile Include="src\VK\Devices\Queue.cpp" />
@@ -403,9 +411,19 @@
     <ClInclude Include="include\GLM\glm\vec3.hpp" />
     <ClInclude Include="include\GLM\glm\vec4.hpp" />
     <ClInclude Include="include\GLM\glm\vector_relational.hpp" />
+    <ClInclude Include="include\IMGUI\imconfig.h" />
+    <ClInclude Include="include\IMGUI\imgui.h" />
+    <ClInclude Include="include\IMGUI\imgui_impl_glfw.h" />
+    <ClInclude Include="include\IMGUI\imgui_impl_vulkan.h" />
+    <ClInclude Include="include\IMGUI\imgui_internal.h" />
+    <ClInclude Include="include\IMGUI\imstb_rectpack.h" />
+    <ClInclude Include="include\IMGUI\imstb_textedit.h" />
+    <ClInclude Include="include\IMGUI\imstb_truetype.h" />
     <ClInclude Include="src\Containers\AllocVector.h" />
+    <ClInclude Include="src\Debug\ImguiModule.h" />
     <ClInclude Include="src\ECS\Component\Component.h" />
     <ClInclude Include="src\ECS\Entity\Entity.h" />
+    <ClInclude Include="src\Events\EventCollection\WindowEvents.h" />
     <ClInclude Include="src\General_Utils.h" />
     <ClInclude Include="src\VK\GraphicsPipeline.h" />
     <ClInclude Include="src_demo\GameManager.h" />

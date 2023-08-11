@@ -12,36 +12,11 @@
 #endif
 
 
-void PrintAlloc(AllocVector_Medium<int, true>& alloc)
-{
-	std::cout << "== Printing ==\n";
-	for (auto& v : alloc)
-	{
-		std::cout << v << "\n";
-	}
-}
+
 APPSTART
 {
 
-	AllocVector_Medium<int,true> testAlloc {6,1,2,6,1,8,2,4};
-	for (int i = 0 ; i < 10; i++)
-	{
-		testAlloc.Push(i);
-
-	}
-	PrintAlloc(testAlloc);
-	for (int i = 0; i < 10; i+=2)
-	{
-		testAlloc.Erase(i);
-
-	}
-	PrintAlloc(testAlloc);
-	for (int i = 25; i < 50; i += 2)
-	{
-		testAlloc.Push(i);
-
-	}
-	PrintAlloc(testAlloc);
+	
 
 	Landmark::Engine::AttachModule<GameManager>();
 	Landmark::EngineInitParameters InitParameters;

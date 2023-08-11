@@ -34,37 +34,49 @@ namespace Landmark
 			std::vector<VkImageView> ImageViews;
 			std::vector<VkFramebuffer> Framebuffers;
 
-			VkFence PresentingFence;
-
+			VkSemaphore ImageAvailableSemaphore;
+			VkFence ImageAquiringFence;
 			bool Initialized = false;
 			//VkPhysicalDevice _DeviceAssosiated;
 			
 			
 			
 		private:
-			Window();
+			
+			
 		
 		protected:
+			Window();
 			void Init();
+			void Destroy();
 
 		public:
+
 			
 			VkSurfaceKHR GetSurface() { return _Surface; };
 			bool GetShouldClose();
 			void SetShouldClose(bool state);
 
-			
-			
+			VkFramebuffer GetNextImage(uint32_t* ImageIndex);
+			VkSemaphore GetImageAvailableSemaphore() const { return ImageAvailableSemaphore; }
 
 			void MakeCurrent();
-			uint32_t GetNextImageIndex() const;
-			VkFramebuffer GetFramebuffer(uint32_t Index);
-			void PushFramebuffer(uint32_t ImageIndex);
+
+			void Present(const std::vector<VkSemaphore>& WaitSemaphores, uint32_t ImageIndex);
 
 			uvec2 GetWindowSize() const
 			{
 				return WindowSize;
 			}
+
+			
+			bool operator==(const Window& o) const { return _Window == o._Window; }
+		protected:
+
+
+			void ResizeCallback( int sizeX, int sizeY);
+			void FramebufferSizeCallback(int sizeX, int sizeY);
+			void CloseCallback();
 
 			
 		};

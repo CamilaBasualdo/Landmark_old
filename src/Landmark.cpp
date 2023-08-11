@@ -9,7 +9,7 @@
 #include "Time/Time.h"
 #include "Audio/AudioSystem.h"
 #include <thread>
-
+#include <Debug/ImguiModule.h>
 #ifdef _WIN32
 #include <windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
@@ -25,12 +25,14 @@ namespace Landmark
 		AttachModule<IO::WindowManager>();
 		AttachModule<Time>();
 		AttachModule<Audio::AudioSystem>();
+		//AttachModule<Debug::ImguiModule>();
 	}
 
 	void Engine::InitializationProcess()
 	{
 		LogSystem::Init();
 		LogSystem::Log(std::string(Logo32) + "\n");
+		
 
 
 #ifdef _DEBUG
@@ -42,6 +44,11 @@ namespace Landmark
 		LOGGER.Log(ExePath);
 		if (InitializationParameters.IncludeDefaultModules) DefaultModulesAttach();
 
+
+		std::vector<std::string> ModuleNames;
+		for (auto& mod : _EngineModules)
+			ModuleNames.push_back(mod.first->name());
+		LOGGER.Log_List("Engine Modules", ModuleNames);
 		LOGGER.Debug("Engine Init");
 
 
@@ -73,6 +80,7 @@ namespace Landmark
 			for (auto M : _EngineModules)
 				M.second->Update();
 
+			/*
 			// Calculate the elapsed time for the loop iteration
 			auto endTime = std::chrono::steady_clock::now();
 			auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(endTime - startTime);
@@ -84,9 +92,10 @@ namespace Landmark
 			if (sleepDuration > std::chrono::duration<double>(0))
 				std::this_thread::sleep_for(sleepDuration);
 
-
+				*/
 
 		}
+		
 	}
 
 	void Engine::ShutdownProcess()
@@ -113,6 +122,7 @@ namespace Landmark
 	{
 		
 		InitializationParameters = p;
+		
 		InitializationProcess();
 		
 		UpdateProcess();

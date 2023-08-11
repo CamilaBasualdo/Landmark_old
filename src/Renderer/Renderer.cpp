@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include "Components/TestRenderComponent.h"
+#include <Events/EventCollection/WindowEvents.h>
 namespace Landmark
 {
 	class Engine;
@@ -24,10 +25,7 @@ namespace Landmark
 			
 		}
 	
-		std::string Renderer::GetName() const
-		{
-			return std::string("RenderLogic");
-		}
+	
 
 		void Renderer::PreInit()
 		{
@@ -37,11 +35,11 @@ namespace Landmark
 
 
 
-			SubscribeTo<Vk::Event_GpuTaskRequest>([&](Vk::Event_GpuTaskRequest& e) {
+			SubscribeTo<Events::Event_GpuTaskRequest>([&](Events::Event_GpuTaskRequest& e) {
 				//LOGGER.Log("Requesting Main Rendering Task on Device 0 (HARDCODED) Type: " + std::string(string_VkPhysicalDeviceType(e.AvailableDevices[0].deviceProperties.deviceType)));
 				
 
-				Vk::Event_GpuTaskRequest::TaskRequest request = {
+				Events::Event_GpuTaskRequest::TaskRequest request = {
 					"Renderer Main Task",
 					Vk::Task::TaskIntensities::VERY_HIGH,
 					e.AvailableDevices[0].DeviceID,
@@ -56,7 +54,7 @@ namespace Landmark
 				RenderingTask = e.DeclareTask(request);
 				});
 			
-			SubscribeTo<IO::Event_WindowFormatsSelected>([&](IO::Event_WindowFormatsSelected&)
+			SubscribeTo<Events::WM_SurfaceFormatsSelectedEvent>([&](Events::WM_SurfaceFormatsSelectedEvent&)
 			{
 					LOGGER.Log("Window Manager Finsished selecting formats. Initializing");
 					InitRenderPass();
@@ -117,8 +115,8 @@ namespace Landmark
 			renderPassInfo.subpassCount = 1;
 			renderPassInfo.pSubpasses = &subpass;
 
-
-			if (vkCreateRenderPass(Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice() , &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+			auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
+			if (vkCreateRenderPass(device , &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
 				LOGGER.Critical("Failed to create Renderpass");
 			}
 			std::stringstream loginfo;
@@ -126,6 +124,13 @@ namespace Landmark
 			for (int i = 0; i < renderPassInfo.subpassCount; i++)
 				loginfo <<"\n" << i << " " << string_VkPipelineBindPoint(renderPassInfo.pSubpasses[i].pipelineBindPoint);
 			LOGGER.Log( loginfo.str());
+
+			VkSemaphoreCreateInfo semaphoreInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,nullptr,0 };
+			vkCreateSemaphore(device,&semaphoreInfo, NULL, &RenderFinishedSemaphore);
+			LOGGER.Log("Render Finished Semaphore Created");
+
+			VkFenceCreateInfo fenceInfo{ VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,nullptr,VK_FENCE_CREATE_SIGNALED_BIT };
+			vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence);
 		}
 		static std::vector<char> readFile(const std::string& filename) {
 			std::ifstream file(filename, std::ios::ate | std::ios::binary);
@@ -144,16 +149,23 @@ namespace Landmark
 		void Renderer::CreateDefaultGBufferShader()
 		{
 			
-
+			
 			DefaultGBufferShader
-				.AttachModule(Vk::GraphicsPipeline::VERTEX, readFile("Deferred.vert.spv"))
-				.AttachModule(Vk::GraphicsPipeline::FRAGMENT, readFile("Deferred.frag.spv"))
+				.AttachModule(Vk::GraphicsPipeline::VERTEX, readFile("Shaders\\Deferred.vert.spv"))
+				.AttachModule(Vk::GraphicsPipeline::FRAGMENT, readFile("Shaders\\Deferred.frag.spv"))
 				.Build();
 		}
 
 		void Renderer::Render()
 		{
+			auto device = Vk::DeviceManager::GetMainPresentingDevice()->GetVkDevice();
+
+			vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+			vkResetFences(device, 1, &inFlightFence);
+
+
 			auto& window = IO::WindowManager::MainWindow();
+			RenderingTask->Reset();
 			RenderingTask->BeginRecord();
 
 			auto cmdBuffer = RenderingTask->GetCmdBuffer();
@@ -164,8 +176,11 @@ namespace Landmark
 			VkClearValue clearColor = { 0.0f,0.0f,0.0f,1.0f };
 			info.pClearValues = &clearColor;
 			info.pNext = nullptr;
-			uint32_t imageindex = window.GetNextImageIndex();
-			info.framebuffer = window.GetFramebuffer(imageindex);
+			uint32_t imageindex;
+	
+				auto framebuffer = window.GetNextImage(&imageindex);
+
+			info.framebuffer = framebuffer;
 			info.renderArea.offset = { 0,0 };
 			auto size = window.GetWindowSize();
 			info.renderArea.extent = { size.x,size.y };
@@ -192,8 +207,16 @@ namespace Landmark
 				comp.Render();
 			}
 			vkCmdEndRenderPass(cmdBuffer);
+
+	
 			RenderingTask->EndRecord();
-			window.PushFramebuffer(imageindex);
+			RenderingTask->Submit({ window.GetImageAvailableSemaphore() }, 
+				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 
+				{ RenderFinishedSemaphore }, 
+				inFlightFence);
+
+			window.Present({ RenderFinishedSemaphore }, imageindex);
+
 		}
 
 
@@ -203,21 +226,26 @@ namespace Landmark
 			LOGGER.Log("Rendering Thread Init");
 			//ainWindow->MakeCurrent();
 
-			while (!CloseThread)
+			while (!IO::WindowManager::MainWindow().GetShouldClose())
 			{
-				if (IO::WindowManager::MainWindow().GetShouldClose())
-					Engine::Shutdown();
+				//auto size = IO::WindowManager::MainWindow().GetWindowSize();
+				//LOGGER.Log()
 
 				Render();
-				
+			
+
 			}
+			Engine::Shutdown();
+			LOGGER.Log("Rendering Thread Finished");
 		}
 
 		
-		void Renderer::Exit()
+		void Renderer::PreExit()
 		{
 			CloseThread = true;
+			
 			RenderingThread.join();
+			
 			LOGGER.Log("Rendering Thread Closed");
 		}
 	}
